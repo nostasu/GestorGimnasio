@@ -23,5 +23,5 @@ Los gimnasios también tendrán acceso a quien ha reservado sus clases, y podrá
     3.	Los gimnasios podrán ver los usuarios listados por cuota (cuanto pagan y cuantas clases tienen) ❌
     4.	Los gimnasios podrán ver las reservas totales, además de las reservas por cada uno de sus TIPOS de clase. ❌
 
-![ScreenShot](../GestorReservas.png)
+![ScreenShot](./GestorReservas.png)
  
