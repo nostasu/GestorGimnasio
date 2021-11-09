@@ -8,20 +8,41 @@ Los gimnasios también tendrán acceso a quien ha reservado sus clases, y podrá
 ## Descripción funcional de la aplicación
 ¿qué se puede hacer?
 -	A nivel de usuario
-    1. Crear nuevo usuario (que estará vinculado con un gimnasio)introduciendo sus datos personales y asociarle la cuota pagada (dará lugar al número de clases). Dentro de las clases tendrá derecho a cualquiera de sus modalidades. ❌
+    1. Crear nuevo usuario (que estará vinculado con un gimnasio)introduciendo sus datos personales y asociarle la cuota pagada (dará lugar al número de clases). Dentro de las clases tendrá derecho a cualquiera de sus modalidades. ✅ Ruta --> /api/usuarios
+    2. Mostrar todos usuarios disponibles en la BBDD✅ Ruta --> /api/usuarios
     2. Ver sus clases. ❌
     3.	Reservar una nueva clase. ❌
-    4.	Modificar reservas. ❌
-    5.	Cancelar reservas. ❌
+    4.	Cancelar reservas. ❌
 -	Clases
-    1.	Contendrán el id, el tipo de la clase (tacfit, entrenamiento personal, entrenamiento en grupo) la fecha y hora, los alumnos inscritos (llevara el id de cada alumno), y el máximo de alumnos. También podría hacer que cada entrenador estuviera asociado a una clase. (No es del todo realista). 
-    2.	Se podrá reservar clases a una semana vista. ❌
+    1.	Contendrán el id, el tipo de la clase (tacfit, entrenamiento personal, entrenamiento en grupo) la fecha y hora, los alumnos inscritos (llevara el id de cada alumno), y el máximo de alumnos.  ✅
+    2.	Las clases se actualizaran automaticamente cuando un usuario entre a la aplicacion, y asi la clase que ya haya finalziado se modificara y pasará a ser la de dentro de 7 dias.
     3.	Tendremos un listado al que podrán acceder usuarios y gimnasios, de todas las reservas que hay para el día / semana. ❌
 -	A nivel de gimnasio.
-    1. Creación gimnasio. Cada gimnasio tendrá su id, el nombre del centro, la dirección, el logo, un array con los entrenadores [nombre0, nombre1] un array u objeto con las distintas cuotas que ofrece el gimnasio (ej, cuota1 { precio : 55, clases : 8};) y el tipo de las clases que va a ofrecer: (tacfit, entrenamiento en grupo, entrenamiento personal). ❌
-    2.	Los gimnasios podrán ver todos los usuarios activos en su centro. ❌
-    3.	Los gimnasios podrán ver los usuarios listados por cuota (cuanto pagan y cuantas clases tienen) ❌
-    4.	Los gimnasios podrán ver las reservas totales, además de las reservas por cada uno de sus TIPOS de clase. ❌
+    1. Creación gimnasio. Cada gimnasio tendrá su id, el nombre del centro, la dirección, el logo, un array con un objeto por cada entrenador [entr0, entr1] y un array con las distintas cuotas que ofrece el gimnasio (ej, cuota1 { precio : 55, clases : 8};) y el tipo de las clases que va a ofrecer: (tacfit, entrenamiento en grupo, entrenamiento personal). ✅
+    Ruta --> /api/gimnasios (POST).
+    2. Se podran ver todos los gimnasios de la BBDD 
+    Ruta--> api/gimnasios/✅
+    3. Buscar un gimnasio por su id. 
+    Ruta --> api/gimnasios/find/:id✅
+    4.	Los gimnasios podrán ver todos los usuarios activos en su centro. 
+    Ruta --> api/gimnasios/find/:id/users✅
+    5. Actualizar los datos del gimnasio (incluyendo clases nuevas creadas)
+    Ruta -->/api/gimnasios/:id/update✅
+    7.	Los gimnasios podrán ver las reservas totales, además de las reservas por cada uno de sus TIPOS de clase. ❌
+    8. Borrar un gimnasio por id. 
+    Ruta --> /api/gimnasios/delete/:id ✅
+    9. Actualizar los datos de un gimnasio
+    Ruta --> /api/gimnasios/update/:id 
+    10. Usuarios listados por cuota
+    Ruta --> /api/gimnasios/:id/listarCuotas✅
+
+- A nivel de cuotas (Fees)
+    1. Crear.  Ruta--> /api/cuotas  (POST)✅
+    2. Mostrar todos.  Ruta--> /api/cuotas   (GET)✅
+    3. Mostrar 1 por id.   Ruta-->/api/cuotas/find/:id✅
+    4. Actualizar cuota.  Ruta --> /api/cuotas/update/:id✅ 
+    5. Eliminar cuota.  Ruta --> /api/cuotas/delete/:id✅ 
+
 
 ![ScreenShot](./GestorReservas.png)
  
