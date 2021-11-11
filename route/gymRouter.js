@@ -72,32 +72,8 @@ gymRouter.get("/", async (req, res) => {
     }
 });
 
-//Encuentra un gimnasio por id
-gymRouter.get("/find/:id", async (req, res) => {
-    try {
-        const { id } = req.params
-        const gym = await Gym.findById(id);
-        if (!gym) {
-            return res.status(404).json({
-                sucess: false,
-                message: "No existe ningun gimnasio con esta id"
-            })
-        }
-        return res.json({
-            success: true,
-            gym
-        })
-    } catch (err) {
-        console.log(err);
-        return res.status(403).json({
-            success: false,
-            message: err.message
-        });
-    }
-})
-
 //Dado un gimnasio, ver todos los usuarios activos en su centro. 
-gymRouter.get("/find/:id/users", async (req, res) => {
+gymRouter.get("/find/users/:id", async (req, res) => {
     try {
         const { id } = req.params  //La id del gimnasio
 
@@ -120,29 +96,6 @@ gymRouter.get("/find/:id/users", async (req, res) => {
 
     } catch (err) {
         console.log(err);
-        return res.status(403).json({
-            success: false,
-            message: err.message
-        });
-    }
-})
-
-//Encuentra un gimnasio por id
-gymRouter.get("/find/:id", async (req, res) => {
-    try {
-        const { id } = req.params
-        const gym = await Gym.findById(id);
-        if (!gym) {
-            return res.status(404).json({
-                sucess: false,
-                message: "No existe ningun gimnasio con esta id"
-            })
-        }
-        return res.json({
-            success: true,
-            gym
-        })
-    } catch (err) {
         return res.status(403).json({
             success: false,
             message: err.message
@@ -173,6 +126,30 @@ gymRouter.delete("/delete/:id", async (req, res) => {
     }
 });
 
+//Encuentra un gimnasio por id
+gymRouter.get("/find/:id", async (req, res) => {
+    try {
+        const { id } = req.params
+        const gym = await Gym.findById(id);
+        if (!gym) {
+            return res.status(404).json({
+                sucess: false,
+                message: "No existe ningun gimnasio con esta id"
+            })
+        }
+        return res.json({
+            success: true,
+            gym
+        })
+    } catch (err) {
+        console.log(err);
+        return res.status(403).json({
+            success: false,
+            message: err.message
+        });
+    }
+})
+
 //Actualizacion de los datos del gimnasio
 gymRouter.put("/:id/update", async (req, res) => {
     try {
@@ -194,18 +171,7 @@ gymRouter.put("/:id/update", async (req, res) => {
         if (cuotas) {
             gym.cuotas = cuotas;
         }
-        if (clases) {
-            //El array en el que tenemos que buscar es
-            clases.forEach(clas => {
-                if (!gym.clases.includes(clas)) {
-                    gym.clases.push(clas);
-                    console.log("esta clase no estaba");
-                }
-                else {
-                    console.log(`esta clase ya existia y no se añade: ${clas}`);
-                }
-            });
-        }
+
 
         const gymUpdate = await gym.save();
         return res.json({

@@ -3,7 +3,8 @@ const Schema = mongoose.Schema;
 
 const clasesSchema = new Schema({
     tipoClase: {
-        type: String,  //Le pasamos la id que sera el tipo de clase
+        type: String,
+        enum: ["Tacfit", "Clase", "Entrenamiento Personal"],
         required: true
     },
     fechaHora: {
@@ -17,6 +18,11 @@ const clasesSchema = new Schema({
     maxAlumnos: {
         type: Number,
         required: true
+    },
+
+    gimnasio: {
+        type: mongoose.Types.ObjectId,
+        ref: "User"
     }
 })
 

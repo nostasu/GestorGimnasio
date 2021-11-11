@@ -131,5 +131,4 @@ feeRouter.put("/update/:id", async (req, res) => {
     }
 })
 
-
 module.exports = feeRouter;
