@@ -4,62 +4,6 @@ const Gym = require("../models/Gym");
 const Class = require("../models/Class");
 const userRouter = express.Router();
 
-//Creacion usuario
-userRouter.post("/", async (req, res) => {
-
-    try {
-        const { nombre, apellidos, telefono, email, contraseña, fechaInicio, gimnasio, cuota, reservas } = req.body;
-
-        if (!nombre || !apellidos || !email || !contraseña) {
-            return res.status(403).json({
-                sucess: false,
-                message: "Te has dejado algun dato importante!"
-            })
-        }
-
-        //Al meter un usuario nuevo, comprobar que la cuota existe en el gym (gym.cuotas)
-        const gymExiste = await Gym.findById(gimnasio);
-        if (cuota) {
-            if (gymExiste) {
-                let existeCuota = gymExiste.cuotas.find(cuotaGym => cuotaGym.equals(cuota));
-                if (!existeCuota) {
-                    return res.status(403).json({
-                        success: false,
-                        message: "No se ha encontrado esa cuota para ese gimnasio!"
-                    });
-                }
-            }
-        }
-
-        let user = new User({
-            nombre, apellidos, telefono, email, contraseña, fechaInicio, gimnasio, cuota, reservas
-        })
-
-
-        const newUser = await user.save();
-
-        return res.status(201).json({
-            success: true,
-            user: newUser
-        })
-
-    } catch (err) {
-        const mensaje = err.message;
-        console.log(err);
-
-        if (mensaje.includes("User validation failed: contraseña")) {
-            return res.status(403).json({
-                succes: false,
-                message: "La contraseña necesita minimo 1 caracter especial, 1 num, min, mayus, longitud>6"
-            });
-        } else {
-            return res.status(403).json({
-                success: false,
-                message: err.message
-            });
-        }
-    }
-});
 
 //Obtiene todos los usuarios
 userRouter.get("/", (req, res) => {
@@ -81,9 +25,9 @@ userRouter.get("/", (req, res) => {
 });
 
 //Obtener 1 usuario por id
-userRouter.get("/find/:id", async (req, res) => {
+userRouter.get("/find/", async (req, res) => {
     try {
-        const { id } = req.params
+        const { id } = req.body;
         const user = await User.findById(id).populate("gimnasio", "nombreCentro").populate("reservas");
         if (!user) {
             return res.status(404).json({
@@ -104,9 +48,9 @@ userRouter.get("/find/:id", async (req, res) => {
 })
 
 //Inscribirse a una clase
-userRouter.put("/inscribirse/:id", async (req, res) => {
+userRouter.put("/inscribirse/", async (req, res) => {
     try {
-        const { id } = req.params; //Tengo la id del usuario, sacamos su gimnasio
+        const { id } = req.user; //Tengo la id del usuario, sacamos su gimnasio
 
         const usuario = await User.findById(id).populate("gimnasio"); //Asi me saca su usuario.
 
@@ -185,9 +129,9 @@ userRouter.put("/inscribirse/:id", async (req, res) => {
 });
 
 // Modificar usuario.
-userRouter.put("/update/:id", async (req, res) => {
+userRouter.put("/update/", async (req, res) => {
     try {
-        const { id } = req.params  //La id de la cuota a modificar
+        const { id } = req.user;  //La id de la cuota a modificar
 
         const { nombre, apellidos, telefono, email, contraseña, fechaInicio, gimnasio, cuota, reservas } = req.body;
 
@@ -270,10 +214,10 @@ userRouter.put("/update/:id", async (req, res) => {
 });
 
 //Eliminar reserva y eliminar el usuario de clases-> alumnosInscritos
-userRouter.put("/delete/clase/:id", async (req, res) => {
+userRouter.put("/delete/clase/", async (req, res) => {
     try {
 
-        const { id } = req.params;
+        const { id } = req.user;
 
         const { reservas } = req.body
 
@@ -333,7 +277,7 @@ userRouter.put("/delete/clase/:id", async (req, res) => {
 userRouter.delete("/delete/", async (req, res) => {
     try {
 
-        const { id } = req.body;
+        const { id } = req.user;
 
         const usuario = await User.findByIdAndDelete(id);
         if (!usuario) {

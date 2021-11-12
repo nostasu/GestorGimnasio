@@ -74,7 +74,7 @@ classRouter.post("/", async (req, res) => {
     };
 });
 
-
+//Mostrar todas clases
 classRouter.get("/", (req, res) => {
     Class.find({}, (err, classes) => {
         if (err) {
@@ -85,13 +85,13 @@ classRouter.get("/", (req, res) => {
 });
 
 //Encuentra todos los usuarios de tooodas las clases
-classRouter.get("/todasClasesUsuarios", async (req, res) => {
-    Class.find().populate("alumnosInscritos").exec((err, classes) => {
+classRouter.get("/todasClasesUsuarios", (req, res) => {
+    Class.find().populate("alumnosInscritos", "nombre").exec((err, classes) => {
 
         if (err) {
             res.status(400).send(err.response.data);
         }
-        res.json(classes); //todos las clases
+        res.json(classes);
     });
 });
 
@@ -116,6 +116,7 @@ classRouter.put("/updateClasses", async (req, res) => {
                 newDate = clase.fechaHora.setDate(clase.fechaHora.getDate() + 7);
                 claseCambiar.fechaHora = newDate;
                 claseCambiar.alumnosInscritos = [];
+                //tambien tenemos que buscar la reserva en user.reservas y borrarla
                 await claseCambiar.save();
             }
         });
@@ -137,7 +138,6 @@ classRouter.delete("/delete/:id", async (req, res) => {
 
         const { id } = req.params;
 
-        //        const claseABorrar = await Class.findByIdAndDelete(id);  
         const claseABorrar = await Class.findByIdAndDelete(id);  //claseABorrar.gimnasio == id del gimnasio.
         const gym = await Gym.findById(claseABorrar.gimnasio);  //me encuentra el gimnasio con esa id
         gym.clases.remove(id); //Aqui tenemos que eliminar en clases la id del parametro
@@ -158,4 +158,27 @@ classRouter.delete("/delete/:id", async (req, res) => {
     }
 });
 
+//Mostrar 1 clase por id
+classRouter.get("/find/:id", async (req, res) => {
+    try {
+        const { id } = req.params
+        const clase = await Class.findById(id).populate("gimnasio", "nombre");
+        if (!clase) {
+            return res.status(404).json({
+                sucess: false,
+                message: "No existe ningun clase con esta id"
+            })
+        }
+        return res.json({
+            success: true,
+            clase
+        })
+    } catch (err) {
+        console.log(err);
+        return res.status(403).json({
+            success: false,
+            message: err.message
+        });
+    }
+})
 module.exports = classRouter;

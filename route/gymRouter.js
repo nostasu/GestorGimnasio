@@ -105,19 +105,31 @@ gymRouter.get("/find/users/:id", async (req, res) => {
 
 //Eliminar un gimnasio
 gymRouter.delete("/delete/:id", async (req, res) => {
+
     try {
 
         const { id } = req.params;
 
         const gymBorrado = await Gym.findByIdAndDelete(id);
-
         if (!gymBorrado) {
             return res.sendStatus(404).json({
                 success: false,
                 message: "No se ha encontrado el gimnasio que desea borrar"
             });
         }
-        return res.send(`Se ha borrado de la BBDD el gym con id ${id}`);
+
+        //Borrar en Clases las clases en las que se impartian en ese gym
+        let clasesGym = await Class.findByIdAndDelete({
+            gimnasio: gymBorrado._id,
+        });
+        console.log(clasesGym);
+
+
+        return res.json({
+            sucess: true,
+            message: `Se ha borrado de la BBDD el gimnasio con id ${id}`
+        });
+
     } catch (err) {
         return res.status(403).json({
             success: false,
@@ -155,7 +167,7 @@ gymRouter.put("/:id/update", async (req, res) => {
     try {
         const { id } = req.params  //La id del gimnasio
 
-        const { nombreCentro, direccion, entrenadores, cuotas, clases } = req.body;
+        const { nombreCentro, direccion, entrenadores, cuotas } = req.body;
 
         let gym = await Gym.findById(id);
 
@@ -186,6 +198,7 @@ gymRouter.put("/:id/update", async (req, res) => {
         });
     }
 })
+
 //Usuarios listados por cuota, es necesario indicar por params una cuota
 gymRouter.get("/:id/listarCuotas", async (req, res) => {
 
@@ -204,8 +217,7 @@ gymRouter.get("/:id/listarCuotas", async (req, res) => {
             const usuariosCuota = await Users.find();
 
             const usFiltrados = usuariosCuota.filter(user => {
-                if (user.cuota.equals(cuotas[0]) && user.gimnasio.equals(id)) {
-                    console.log(user.gimnasio);
+                if (user.cuota.equals(cuotas) && user.gimnasio.equals(id)) {
                     return user
                 }
             });
