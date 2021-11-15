@@ -4,25 +4,25 @@ const Gym = require("../models/Gym");
 const Class = require("../models/Class");
 const userRouter = express.Router();
 
+userRouter.route("/")
+    //Obtiene todos los usuarios
+    .get(async (req, res) => {
+        try {
+            let users = await User.find({}, (err, user) => {
+                if (err) {
+                    res.status(400).send(err.response.data);
+                }
+                res.json(user);
+            });
 
-//Obtiene todos los usuarios
-userRouter.get("/", (req, res) => {
-    try {
-        let users = User.find({}, (err, user) => {
-            if (err) {
-                res.status(400).send(err.response.data);
-            }
-            res.json(user);
-        });
-
-    } catch (err) {
-        console.log(err);
-        return res.status(400).json({
-            succes: false,
-            message: err.message
-        })
-    }
-});
+        } catch (err) {
+            console.log(err);
+            return res.status(400).json({
+                succes: false,
+                message: err.message
+            })
+        }
+    });
 
 //Obtener 1 usuario por id
 userRouter.get("/find/", async (req, res) => {
@@ -273,43 +273,7 @@ userRouter.put("/delete/clase/", async (req, res) => {
     }
 });
 
-//Borrar usuario. Borrando tambien en el arrayList de clases las clases en las que estuviera inscrito.
-userRouter.delete("/delete/", async (req, res) => {
-    try {
 
-        const { id } = req.user;
-
-        const usuario = await User.findByIdAndDelete(id);
-        if (!usuario) {
-            return res.sendStatus(404).json({
-                success: false,
-                message: "No se ha encontrado el usuario para borrarlo"
-            });
-        }
-
-        //Si el usuario estaba inscrito en alguna clase, borrarlo.
-        let reservasClase = await Class.find({
-            alumnosInscritos: id
-        }); //Me encuentra todas mis clases
-        //Reservas clase es un array
-        reservasClase.forEach(async clase => {
-            let i = clase.alumnosInscritos.indexOf(id); //Me encuentra el indice de la id
-            clase.alumnosInscritos.splice(i, 1);
-            await clase.save();
-        })
-
-        return res.json({
-            sucess: true,
-            message: `Se ha borrado de la BBDD el usuario con id ${id}`
-        });
-
-    } catch (err) {
-        return res.status(403).json({
-            success: false,
-            message: err.message
-        });
-    }
-});
 
 
 

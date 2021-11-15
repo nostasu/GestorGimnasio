@@ -2,88 +2,176 @@ const express = require("express");
 const Class = require("../models/Class"); //requerimos el export
 const Gym = require("../models/Gym");
 const classRouter = express.Router();
+const { checkToken } = require("../middleware");
+const User = require("../models/User");
 
 
-classRouter.post("/", async (req, res) => {
-
-    try {
-        let { tipoClase, fechaHora, alumnosInscritos, maxAlumnos, gimnasio } = req.body;
-
-        //Los required, los controlamos
-        if (!tipoClase || !fechaHora || !maxAlumnos || !gimnasio) {
-            return res.status(403).json({
-                sucess: false,
-                mensaje: "Es necesario introducir el tipoClase, la fechaHora, y el maxAlumnos!"
-            })
-        }
-
-        //Ponemos la hora correcta
-        if (fechaHora) {
-            let horasCorrectas = new Date(fechaHora);
-            fechaHora = horasCorrectas.setHours(horasCorrectas.getHours() + 2);
-        }
-
-
-        let clase = new Class({
-            tipoClase, fechaHora, alumnosInscritos, maxAlumnos, gimnasio
-        });
-
-        //Antes de guardar la clase, comprobar que no esta ya
-
-        const todasClases = await Class.find(); // Nos sacamos todas clases, iteramos por ellas
-        const gym = await Gym.findById(gimnasio);
-
-        if (!gym) {
-            return res.status(403).json({
-                succes: false,
-                message: "Hey! No existe este gimnasio! Introduce uno valido"
-            });
-        }
-
-        let existeClase;
-        let encontradoClase = todasClases.find(clase => {
-            let horaExistente = Date.now(clase.fechaHora);
-            let fecha = new Date(fechaHora);
-            if ((clase.tipoClase == tipoClase) && (clase.gimnasio == gimnasio) && (clase.fechaHora.getTime() == fecha.getTime())) {
-                existeClase = true;
-            }
-        });
-        if (existeClase) {
-            return res.status(403).json({
-                succes: false,
-                message: "Hey! Ya existe esta clase"
-            });
-        }
-        //Al crear la clase, la tenemos que añadir tambien al arrayList de clases del gimnasio
-
-        const newClass = await clase.save();
-        gym.clases.push(newClass._id);
-        await gym.save();
-
-        return res.status(201).json({
-            success: true,
-            newClass
-        })
-
-    } catch (err) {
-        console.log(err);
+async function comprobarGymToken(idGym) {
+    const gym = await Gym.findById(idGym);
+    if (!gym) {
         return res.status(403).json({
             succes: false,
-            message: err.message
+            message: "Hey! Debes conectarte como gym para acceder a esta seccion!"
         });
-    };
-});
+    } else {
+        return gym;
+    }
+}
+classRouter
+    .route("/")
 
-//Mostrar todas clases
-classRouter.get("/", (req, res) => {
-    Class.find({}, (err, classes) => {
-        if (err) {
-            res.status(400).send(err.response.data);
+    //Crear clase, privada, solo puede crear las clases un gym conectado
+    .post(checkToken, async (req, res) => {
+
+        try {
+            const { id } = req.user;
+
+            const gym = await comprobarGymToken(id);
+
+            let { tipoClase, fechaHora, alumnosInscritos, maxAlumnos, gimnasio } = req.body;
+
+            gimnasio = id;
+            //Los required, los controlamos
+            if (!tipoClase || !fechaHora || !maxAlumnos) {
+                return res.status(403).json({
+                    sucess: false,
+                    mensaje: "Es necesario introducir el tipoClase, la fechaHora, y el maxAlumnos!"
+                })
+            }
+
+            //Ponemos la hora correcta
+            if (fechaHora) {
+                let horasCorrectas = new Date(fechaHora);
+                fechaHora = horasCorrectas.setHours(horasCorrectas.getHours() + 1);
+            }
+
+            let clase = new Class({
+                tipoClase, fechaHora, alumnosInscritos, maxAlumnos, gimnasio
+            });
+
+            //Antes de guardar la clase, comprobar que no esta ya
+
+            const todasClases = await Class.find(); // Nos sacamos todas clases, iteramos por ellas
+
+            let encontradoClase = todasClases.find(clase => {
+                let fecha = new Date(fechaHora);
+                if ((clase.tipoClase == tipoClase) && (clase.gimnasio == gimnasio) && (clase.fechaHora.getTime() == fecha.getTime())) {
+                    return clase;
+                }
+            });
+            if (encontradoClase) {
+                return res.status(403).json({
+                    succes: false,
+                    message: "Hey! Ya existe esta clase"
+                });
+            }
+            //Al crear la clase, la tenemos que añadir tambien al arrayList de clases del gimnasio
+
+            const newClass = await clase.save();
+            gym.clases.push(newClass._id);
+            await gym.save();
+
+            return res.status(201).json({
+                success: true,
+                newClass
+            })
+
+        } catch (err) {
+            console.log(err);
+            return res.status(403).json({
+                succes: false,
+                message: err.message
+            });
+        };
+    })
+
+    //Mostrar todas clases
+    .get(async (req, res) => {
+        await Class.find({}, (err, classes) => {
+            if (err) {
+                res.status(400).send(err.response.data);
+            }
+            res.json(classes); //todos las clases
+        });
+    })
+
+    //Update a existing class. The gym that creates the class is the only one that can modify it.
+    .put(checkToken, async (req, res) => {
+        try {
+            const { id } = req.user;
+
+            await comprobarGymToken(id);
+
+            const { classType, dateHour, users, maxUsers, gym } = req.body;
+
+            let changeClass = await Class.findById(id);
+
+            if (classType) {
+                return res.status(403).json({
+                    success: false,
+                    message: "Hey! You can't modify it! Only the date and max.User!"
+                });
+            }
+            if (dateHour) {
+                changeClass.fechaHora = fechaHora;
+            }
+            if (users) {
+                return res.status(403).json({
+                    success: false,
+                    message: "Hey! You can't modify it! Only the date and max.User!"
+                });
+            }
+
+            if (maxUsers) {
+                changeClass.maxAlumnos = maxAlumnos;
+            }
+
+            if (gym) {
+                return res.status(403).json({
+                    success: false,
+                    message: "Hey! El gimnasio asociado no se puede modificar! Solo la fechaHora"
+                });
+            }
+
+            const newClass = await changeClass.save();
+            return res.json({
+                sucess: true,
+                newClass
+            })
+
+        } catch (err) {
+            return res.status(403).json({
+                success: false,
+                message: err.message
+            });
         }
-        res.json(classes); //todos las clases
-    });
-});
+    })
+    //Borrar clase eliminando la clase tambien del array de Gym MODIIIFICARRR y del Array de Usuarios.reservas
+    .delete(checkToken, async (req, res) => {
+        try {
 
+            const { idGym } = req.user;
+            const { id } = req.body;
+
+            const claseABorrar = await Class.findByIdAndDelete(id);  //me encuentra la clase que quiero borrar
+            const gym = await comprobarGymToken(idGym);  //me encuentra el gimnasio con esa id
+            gym.clases.remove(id); //Aqui tenemos que eliminar en clases la id del parametro
+            gym.save();
+
+            if (!claseABorrar) {
+                return res.sendStatus(404).json({
+                    success: false,
+                    message: "No se ha encontrado la clase que desea borrar"
+                });
+            }
+            return res.send(`Se ha borrado la clase con id ${id}`);
+        } catch (err) {
+            return res.status(403).json({
+                success: false,
+                message: err.message
+            });
+        }
+    });
 //Encuentra todos los usuarios de tooodas las clases
 classRouter.get("/todasClasesUsuarios", (req, res) => {
     Class.find().populate("alumnosInscritos", "nombre").exec((err, classes) => {
@@ -115,8 +203,17 @@ classRouter.put("/updateClasses", async (req, res) => {
                 let newDate = new Date(clase.fechaHora);
                 newDate = clase.fechaHora.setDate(clase.fechaHora.getDate() + 7);
                 claseCambiar.fechaHora = newDate;
+
+                claseCambiar.alumnosInscritos.forEach(async alumn => {
+                    const alumno = await User.findById(alumn._id); //Encuentrame al alumno por su id
+                    alumno.reservas.remove(claseCambiar._id); //me encuentra en el array de clases la clase con esa id y la elimina
+                    await alumno.save();
+                });
+
+                const gym = await Gym.findById(clase.gimnasio);  //me encuentra el gimnasio con esa id de clase /Se supone
+                gym.clases.remove(clase._id);
+                await gym.save();
                 claseCambiar.alumnosInscritos = [];
-                //tambien tenemos que buscar la reserva en user.reservas y borrarla
                 await claseCambiar.save();
             }
         });
@@ -130,32 +227,6 @@ classRouter.put("/updateClasses", async (req, res) => {
             message: err.message
         });
     };
-});
-
-//Borrar clase eliminando la clase tambien del array de Gym MODIIIFICARRR
-classRouter.delete("/delete/:id", async (req, res) => {
-    try {
-
-        const { id } = req.params;
-
-        const claseABorrar = await Class.findByIdAndDelete(id);  //claseABorrar.gimnasio == id del gimnasio.
-        const gym = await Gym.findById(claseABorrar.gimnasio);  //me encuentra el gimnasio con esa id
-        gym.clases.remove(id); //Aqui tenemos que eliminar en clases la id del parametro
-        gym.save();
-
-        if (!claseABorrar) {
-            return res.sendStatus(404).json({
-                success: false,
-                message: "No se ha encontrado la clase que desea borrar"
-            });
-        }
-        return res.send(`Se ha borrado la clase con id ${id}`);
-    } catch (err) {
-        return res.status(403).json({
-            success: false,
-            message: err.message
-        });
-    }
 });
 
 //Mostrar 1 clase por id
