@@ -13,10 +13,10 @@ AuthRouterGym.post("/signup", async (req, res) => {
         const { nombreCentro, password, direccion, entrenadores, cuotas, clases } = req.body;
 
         //Los required, los controlamos
-        if (!nombreCentro) {
+        if (!nombreCentro || !password) {
             return res.status(403).json({
                 sucess: false,
-                mensaje: "Te has dejado o el nombre!"
+                mensaje: "Te has dejado el nombre o la contraseña!"
             })
         }
 
@@ -30,17 +30,12 @@ AuthRouterGym.post("/signup", async (req, res) => {
             })
         }
 
-        console.log(cuotas.length);
-        if (cuotas) {
-            for (let i = 0; i < cuotas.length; i++) {
-                console.log(cuotas[i]);
-                const existeCuota = await Fees.findById(cuotas[i]);
-                if (!existeCuota) {
-                    return res.status(403).json({
-                        sucess: false,
-                        mensaje: "No existe esa cuota!"
-                    })
-                }
+        if (password) {
+            if (!password.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{6,1024}$/)) { //special/number/capital/8caracteres min))
+                return res.status(403).json({
+                    sucess: false,
+                    mensaje: "La contraseña debe contener 6 dígitos, mayusculas, minusculas y caracteres especiales!"
+                })
             }
         }
 
@@ -60,47 +55,55 @@ AuthRouterGym.post("/signup", async (req, res) => {
 
         return res.status(201).json({
             success: true,
-            user: newGym,
+            gym: newGym,
+            message: "Gym añadido a la BBDD"
         })
 
     } catch (err) {
         console.log(err);
         return res.status(403).json({
             success: false,
-            message: err.message || message
+            message: err.message || mensaje
         })
     }
 })
 
 AuthRouterGym.post("/login", async (req, res) => {
-    const { nombreCentro, password } = req.body;
+    try {
+        const { nombreCentro, password } = req.body;
 
-    const gym = await Gym.findOne({ nombreCentro });
+        const gym = await Gym.findOne({ nombreCentro });
 
-    if (!gym) {  //Si no encuentra el nombre del centro, el usuario no existe
+        if (!gym) {  //Si no encuentra el nombre del centro, el usuario no existe
+            return res.status(401).json({
+                sucess: false,
+                message: "Wrong credentials!"
+            })
+        }
+
+        const match = await bcrypt.compare(password, gym.password);   //desencripta la contraseña y mira a ver si es correcta
+
+        if (!match) {
+            return res.status(401).json({
+                sucess: false,
+                message: "Wrong credentials!"
+            })
+        }
+
+        //CREAR TOKEN
+        const token = jwt.sign({ id: gym._id }, JWT_SECRET, { expiresIn: "96h" });  //Secret key, contraseña para abrir la cajita
+
+        return res.status(200).json({
+            success: true,
+            message: `Welcome: ${nombreCentro}. You're login!`,
+            token
+        })
+    } catch (err) {
         return res.status(401).json({
             sucess: false,
-            message: "Wrong credentials!"
+            message: "Ha habido algun error con la verificacion! Acceso no permitido"
         })
     }
-
-    const match = await bcrypt.compare(password, gym.password);   //desencripta la contraseña y mira a ver si es correcta
-
-    if (!match) {
-        return res.status(401).json({
-            sucess: false,
-            message: "Wrong credentials!"
-        })
-    }
-
-    //CREAR TOKEN
-    const token = jwt.sign({ id: gym._id }, JWT_SECRET, { expiresIn: "96h" });  //Secret key, contraseña para abrir la cajita
-
-    return res.status(200).json({
-        success: true,
-        message: `Welcome: ${nombreCentro}. You're login!`,
-        token
-    })
 })
 
 module.exports = AuthRouterGym;

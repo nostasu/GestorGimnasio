@@ -17,12 +17,11 @@ const userSchema = new Schema({
         lowercase: true,
         unique: true,
         required: 'Email address is required',
-        match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
+        match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Por favor, introduzca un email valido']
     },
     password: {
         type: String,
         required: true,
-        match: (/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,1024}$/) //special/number/capital
     },
     fechaInicio: {
         type: Date,

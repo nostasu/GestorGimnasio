@@ -5,26 +5,20 @@ const Class = require("../models/Class");
 const { checkToken } = require("../middleware");
 const gymRouter = express.Router();
 
-async function comprobarAutentificacion(idGym) {
-    let gym = await Gym.findById(idGym);
-    if (!gym) {
-        return res.status(404).json({
-            sucess: false,
-            message: "No existe ningun gimnasio con esta id"
-        })
-    } else {
-        return gym;
-    }
-}
-
 gymRouter
     .route("/")
-    //Muestra el nombre de todos los usuarios del gimnasio logueado, no es necesario login
+    //Muestra el nombre de todos los usuarios del gimnasio login
     .get(checkToken, async (req, res) => {
         try {
             const { id } = req.user; //La id del gym que esta conectado
 
-            await comprobarAutentificacion(id);
+            let gym = await Gym.findById(id);
+            if (!gym) {
+                return res.status(404).json({
+                    sucess: false,
+                    message: "No existe ningun gimnasio con esta id"
+                })
+            }
 
             //existe el gimnasio, mostramos sus usuarios
             const usuariosGym = await Users.find().populate("gimnasio", "nombreCentro");
@@ -59,19 +53,21 @@ gymRouter
         try {
             const { id } = req.user  //La id del gimnasio
 
-            const { direccion, entrenadores, cuotas } = req.body;
+            const { direccion, entrenadores } = req.body;
 
-            let gym = await comprobarAutentificacion(id);
-            console.log(gym);
+            let gym = await Gym.findById(id);
+            if (!gym) {
+                return res.status(404).json({
+                    sucess: false,
+                    message: "No existe ningun gimnasio con esta id"
+                })
+            }
 
             if (direccion) {
                 gym.direccion = direccion;
             }
             if (entrenadores) {
                 gym.entrenadores = entrenadores;
-            }
-            if (cuotas) {
-                gym.cuotas = cuotas;
             }
 
             const gymUpdate = await gym.save();
@@ -93,14 +89,19 @@ gymRouter
         try {
             const { id } = req.user;
 
-            let gymBorrado = await comprobarAutentificacion(id);
+            let gymBorrado = await Gym.findById(id);
+            if (!gymBorrado) {
+                return res.status(404).json({
+                    sucess: false,
+                    message: "No existe ningun gimnasio con esta id"
+                })
+            }
 
             //Borrar en Clases las clases en las que se impartian en ese gym
             gymBorrado.clases.forEach(async claseBorrar => {
                 let clase = await Class.findByIdAndDelete(claseBorrar._id);
                 console.log(`Clase borrada: ${clase}`);
             })
-
 
             //Borrar el campo reservas (ya que todas van a ser de ese Gym), cuota y gym al usuario que estuviera en ese gimnasio
             let usuarios = await Users.find({ gimnasio: id });
@@ -111,6 +112,10 @@ gymRouter
                 await user.save();
             });
 
+            //Borrar en Fees todas sus cuotas
+            gymBorrado.cuotas.forEach(async cuotaGym => {
+                await Fees.findByIdAndDelete(cuotaGym);
+            })
             await Gym.findByIdAndDelete(id);
 
             return res.json({
@@ -126,36 +131,6 @@ gymRouter
         }
     });
 
-//Que el gimnasio, una vez login, pueda ver todos los usuarios activos en su centro. 
-gymRouter.get("/find/users/", checkToken, async (req, res) => {
-    try {
-        const { id } = req.user;  //La id del gimnasio
-
-
-        let users = await Users.find().populate("gimnasio", "nombreCentro");
-        //Todos usuarios cambian su id gym por el nombre
-        const gyms = await Gym.findById(id);  //Nos encuentra el gym con el id pasado
-
-        let usuariosGymnasio = [];
-        users.forEach(user => {
-            if (user.gimnasio.nombreCentro == gyms.nombreCentro) {
-                usuariosGymnasio.push(user);
-            }
-        });
-
-        return res.json({
-            sucess: true,
-            usuariosGymnasio
-        })
-
-    } catch (err) {
-        console.log(err);
-        return res.status(403).json({
-            success: false,
-            message: err.message
-        });
-    }
-})
 
 //Encuentra un gimnasio por id //no es necesario estar login
 gymRouter.get("/find/", async (req, res) => {
@@ -185,7 +160,7 @@ gymRouter.get("/find/", async (req, res) => {
 //Encuentra todos y muestra todo (populate)
 gymRouter.get("/allGyms", async (req, res) => {
     try {
-        let gyms = await Gym.find().populate("cuotas").populate("clases", "nombre");
+        let gyms = await Gym.find().populate("cuotas").populate("clases", "tipoClase");
 
         if (!gyms) {
             return res.status(403).json({
@@ -250,7 +225,5 @@ gymRouter.get("/listarCuotas", checkToken, async (req, res) => {
         });
     }
 })
-
-
 
 module.exports = gymRouter;

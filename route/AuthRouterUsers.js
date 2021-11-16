@@ -11,7 +11,7 @@ AuthRouter.post("/signup", async (req, res) => {
     try {
         const { nombre, apellidos, telefono, email, password, fechaInicio, gimnasio, cuota, reservas } = req.body;
 
-        if (!nombre || !apellidos || !email || !password) {
+        if (!nombre || !apellidos || !email || !password || !gimnasio || !cuota) {
             return res.status(403).json({
                 sucess: false,
                 message: "faltan datos"
@@ -24,7 +24,7 @@ AuthRouter.post("/signup", async (req, res) => {
         if (foundUser) {
             return res.status(403).json({
                 sucess: false,
-                message: "este mail ya existe"
+                message: "Hey! este mail ya esta registrado, prueba a hacer login!"
             })
         }
 
@@ -46,6 +46,15 @@ AuthRouter.post("/signup", async (req, res) => {
                     success: false,
                     message: "No se ha encontrado esa cuota para ese gimnasio!"
                 });
+            }
+        }
+
+        if (password) {
+            if (!password.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{6,1024}$/)) { //special/number/capital/8caracteres min))
+                return res.status(403).json({
+                    sucess: false,
+                    mensaje: "La contraseña debe contener 6 dígitos, mayusculas, minusculas y caracteres especiales!"
+                })
             }
         }
 

@@ -5,18 +5,6 @@ const classRouter = express.Router();
 const { checkToken } = require("../middleware");
 const User = require("../models/User");
 
-
-async function comprobarGymToken(idGym) {
-    const gym = await Gym.findById(idGym);
-    if (!gym) {
-        return res.status(403).json({
-            succes: false,
-            message: "Hey! Debes conectarte como gym para acceder a esta seccion!"
-        });
-    } else {
-        return gym;
-    }
-}
 classRouter
     .route("/")
 
@@ -25,13 +13,17 @@ classRouter
 
         try {
             const { id } = req.user;
-
-            const gym = await comprobarGymToken(id);
+            const gym = await Gym.findById(id);
+            if (!gym) {
+                return res.status(403).json({
+                    succes: false,
+                    message: "Hey! Debes conectarte como gym para acceder a esta seccion!"
+                });
+            }
 
             let { tipoClase, fechaHora, alumnosInscritos, maxAlumnos, gimnasio } = req.body;
 
             gimnasio = id;
-            //Los required, los controlamos
             if (!tipoClase || !fechaHora || !maxAlumnos) {
                 return res.status(403).json({
                     sucess: false,
@@ -87,12 +79,18 @@ classRouter
 
     //Mostrar todas clases
     .get(async (req, res) => {
-        await Class.find({}, (err, classes) => {
-            if (err) {
-                res.status(400).send(err.response.data);
-            }
+        try {
+            let classes = await Class.find({});
+
             res.json(classes); //todos las clases
-        });
+
+        } catch (err) {
+            console.log(err);
+            return res.status(403).json({
+                succes: false,
+                message: err.message
+            });
+        };
     })
 
     //Update a existing class. The gym that creates the class is the only one that can modify it.
@@ -100,7 +98,13 @@ classRouter
         try {
             const { id } = req.user;
 
-            await comprobarGymToken(id);
+            const gymLogin = await Gym.findById(id);
+            if (!gymLogin) {
+                return res.status(403).json({
+                    succes: false,
+                    message: "Hey! Debes conectarte como gym para acceder a esta seccion!"
+                });
+            }
 
             const { classType, dateHour, users, maxUsers, gym } = req.body;
 
@@ -154,7 +158,13 @@ classRouter
             const { id } = req.body;
 
             const claseABorrar = await Class.findByIdAndDelete(id);  //me encuentra la clase que quiero borrar
-            const gym = await comprobarGymToken(idGym);  //me encuentra el gimnasio con esa id
+            const gym = await Gym.findById(idGym);
+            if (!gym) {
+                return res.status(403).json({
+                    succes: false,
+                    message: "Hey! Debes conectarte como gym para acceder a esta seccion!"
+                });
+            }
             gym.clases.remove(id); //Aqui tenemos que eliminar en clases la id del parametro
             gym.save();
 
@@ -210,15 +220,17 @@ classRouter.put("/updateClasses", async (req, res) => {
                     await alumno.save();
                 });
 
-                const gym = await Gym.findById(clase.gimnasio);  //me encuentra el gimnasio con esa id de clase /Se supone
-                gym.clases.remove(clase._id);
-                await gym.save();
+
                 claseCambiar.alumnosInscritos = [];
                 await claseCambiar.save();
             }
         });
 
-        return res.json(clasesOrdenadas);
+        return res.json({
+            success: true,
+            clasesOrdenadas
+
+        })
 
     } catch (err) {
         console.log(err);
@@ -233,7 +245,7 @@ classRouter.put("/updateClasses", async (req, res) => {
 classRouter.get("/find/:id", async (req, res) => {
     try {
         const { id } = req.params
-        const clase = await Class.findById(id).populate("gimnasio", "nombre");
+        const clase = await Class.findById(id).populate("gimnasio", "nombreCentro");
         if (!clase) {
             return res.status(404).json({
                 sucess: false,

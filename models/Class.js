@@ -22,7 +22,7 @@ const clasesSchema = new Schema({
 
     gimnasio: {
         type: mongoose.Types.ObjectId,
-        ref: "User"
+        ref: "Gym"
     }
 })
 

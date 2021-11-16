@@ -37,7 +37,7 @@ feeRouter
 
             const newFee = await fees.save();
 
-            //Al crear la cuota, la tenemos que añadir tambien al arrayList de clases del gimnasio
+            //Al crear la cuota, la tenemos que añadir tambien al arrayList de cuotas del gimnasio
             gym.cuotas.push(newFee._id);
             await gym.save();
 
@@ -74,11 +74,11 @@ feeRouter
     });
 
 feeRouter
-    .route("/:id")
+    .route("/fees")
     //Mostrar 1 cuota por id
     .get(async (req, res) => {
         try {
-            const { id } = req.params;
+            const { id } = req.body;
             const cuota = await Fees.findById(id);
             if (!cuota) {
                 return res.status(404).json({
@@ -99,46 +99,47 @@ feeRouter
     })
     //Eliminar cuota
     .delete(checkToken, async (req, res) => {
-        const { idGym } = req.user;
-        const { id } = req.params;
+        const { id } = req.user;
+        const { idCuota } = req.body;
 
         try {
-            const gymLogin = await Gym.find(idGym);
-            if (!gymLogin) {
+            const gymLogin = await Gym.findById(id);
+            const gym = await Gym.find({ cuotas: idCuota });
+
+            if (gym[0].nombreCentro != gymLogin.nombreCentro) {
                 return res.status(403).json({
                     sucess: false,
-                    mensaje: "Debe estar logueado como gym para poder eliminar sus cuotas!"
+                    mensaje: "Debe estar conectado como gym y debe ser una de sus cuotas!"
                 })
             }
-            let fee = await Fees.findById(id);
+
+            let fee = await Fees.findById(idCuota);
             if (!fee) {
                 return res.status(404).json({
                     sucess: false,
                     message: "No existe ninguna cuota con esta id"
                 })
             }
-            await Fees.findByIdAndDelete(id);
-
-            const gym = await Gym.find({ cuota: id });
+            await Fees.findByIdAndDelete(idCuota);
 
             if (gym) {
                 gym.forEach(async cuotaGym => {
-                    let i = cuotaGym.cuotas.indexOf(id);
-                    if (i > 0) { //No quiero que saque -1 (no encontrado) y borre alguna
+                    let i = cuotaGym.cuotas.indexOf(idCuota);
+                    if (i > -1) { //No quiero que saque -1 (no encontrado) y borre alguna
                         cuotaGym.cuotas.splice(i, 1);
                         await cuotaGym.save();
                     }
                 })
             }
 
-            const foundUser = await User.findOne({ cuota: id });
+            const foundUser = await User.findOne({ cuota: idCuota });
 
             if (foundUser) {
                 foundUser.cuota = null;
                 await foundUser.save();
             }
 
-            return res.send(`Se ha borrado de la BBDD la cuota con id ${id}, avisar al usuario: ${foundUser} para que modifique su cuota`);
+            return res.send(`Se ha borrado de la BBDD la cuota con id ${idCuota}, avisar al usuario: ${foundUser} para que modifique su cuota`);
 
         } catch (err) {
             return res.status(403).json({
@@ -150,19 +151,20 @@ feeRouter
     //Actualizar cuota
     .put(checkToken, async (req, res) => {
         try {
-            const { idGym } = req.user;
-            const { id } = req.params;  //La id de la cuota a modificar
-            const { precio, clases } = req.body;
+            const { id } = req.user;
+            const { idCuota, precio, clases } = req.body;
 
-            const gymLogin = await Gym.find(idGym);
-            if (!gymLogin) {
+            const gymLogin = await Gym.findById(id);
+            const cuotaExisteGym = await Gym.find({ cuotas: idCuota });
+
+            if (cuotaExisteGym[0].nombreCentro != gymLogin.nombreCentro) {
                 return res.status(403).json({
                     sucess: false,
-                    mensaje: "Debe estar logueado como gym para poder eliminar sus cuotas!"
+                    mensaje: "Debe estar conectado como gym y debe ser una de sus cuotas!"
                 })
             }
 
-            let cuota = await Fees.findById(id);
+            let cuota = await Fees.findById(idCuota);
 
             if (precio) {
                 cuota.precio = precio;
