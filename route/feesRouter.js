@@ -18,14 +18,14 @@ feeRouter
             if (!gym) {
                 return next({
                     sucess: false,
-                    mensaje: "You have to login as a Gym if you want to create a new fee!"
+                    message: "You have to login as a Gym if you want to create a new fee!"
                 })
             }
 
             if (!precio || !clases) {
                 return next({
                     sucess: false,
-                    mensaje: "Fields required: precio, clases"
+                    message: "Fields required: precio, clases"
                 })
             }
 
@@ -115,7 +115,7 @@ feeRouter
             if (gym[0].nombreCentro != gymLogin.nombreCentro) {
                 return next({
                     sucess: false,
-                    mensaje: "You have to login as a gym to delete one of your fees!"
+                    message: "You have to login as a gym to delete one of your fees!"
                 })
             }
 
@@ -163,14 +163,19 @@ feeRouter
             const idGym = req.user.id;
             const { id } = req.params;
             const { precio, clases } = req.body;
-
             const gymLogin = await Gym.findById(idGym);
             const cuotaExisteGym = await Gym.find({ cuotas: id });
 
+            if (cuotaExisteGym.length == 0) {
+                return next({
+                    sucess: false,
+                    message: `There isn't any fee with the id: ${id}`
+                })
+            }
             if (cuotaExisteGym[0].nombreCentro != gymLogin.nombreCentro) {
                 return next({
                     sucess: false,
-                    mensaje: "It must be connected as a gym and it neccesary be one of your fees!"
+                    message: "It must be connected as a gym and it neccesary be one of your fees!"
                 })
             }
 

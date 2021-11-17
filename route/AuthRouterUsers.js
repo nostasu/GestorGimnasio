@@ -51,7 +51,7 @@ AuthRouter.post("/signup", async (req, res, next) => {
             if (!password.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{6,1024}$/)) { //special/number/capital/6 characters min))
                 return res.status(403).json({
                     sucess: false,
-                    mensaje: "The password must contain 6 dígits, uppercase, lowercase and special characters!"
+                    message: "The password must contain 6 dígits, uppercase, lowercase and special characters!"
                 })
             }
         }

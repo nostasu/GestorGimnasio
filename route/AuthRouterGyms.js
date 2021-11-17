@@ -14,7 +14,7 @@ AuthRouterGym.post("/signup", async (req, res, next) => {
         if (!nombreCentro || !password) {
             return next({
                 sucess: false,
-                mensaje: "Required fields: nombreCentro, password!"
+                message: "Required fields: nombreCentro, password!"
             })
         }
 
@@ -23,7 +23,7 @@ AuthRouterGym.post("/signup", async (req, res, next) => {
         if (foundGymName) {
             return next({
                 sucess: false,
-                mensaje: "Already exists a gym with this name!"
+                message: "Already exists a gym with this name!"
             })
         }
 
@@ -31,7 +31,7 @@ AuthRouterGym.post("/signup", async (req, res, next) => {
             if (!password.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{6,1024}$/)) { //special/number/capital/6 characters))
                 return next({
                     sucess: false,
-                    mensaje: "The password must contain 6 dígits, uppercase, lowercase and special characters!"
+                    message: 'The password must contain 6 dígits, uppercase, lowercase and special characters'
                 })
             }
         }
@@ -58,7 +58,7 @@ AuthRouterGym.post("/signup", async (req, res, next) => {
     } catch (err) {
         return next({
             status: 403,
-            message: err
+            message: err.message
         });
     }
 })

@@ -27,7 +27,7 @@ classRouter
             if (!tipoClase || !fechaHora || !maxAlumnos) {
                 return next({
                     sucess: false,
-                    mensaje: "Fields required:tipoClase, fechaHora, maxAlumnos, check it and try again"
+                    message: "Fields required:tipoClase, fechaHora, maxAlumnos, check it and try again"
                 })
             }
 

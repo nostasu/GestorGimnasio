@@ -10,7 +10,6 @@ const gymSchema = new Schema({
     password: {
         type: String,
         required: true,
-        match: (/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,1024}$/) //special/number/capital
     },
     direccion: String,
     //logo: img,

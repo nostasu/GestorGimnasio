@@ -27,7 +27,7 @@ userRouter.route("/")
         }
     })
 
-    .put(async (req, res) => {
+    .put(async (req, res, next) => {
         try {
             const { id } = req.user;
 
@@ -111,7 +111,7 @@ userRouter.route("/")
         }
     })
     //Eliminar usuario
-    .delete(async (req, res) => {
+    .delete(async (req, res, next) => {
         try {
 
             const { id } = req.user;
@@ -144,8 +144,8 @@ userRouter.route("/")
         }
     });
 
-//Obtener 1 usuario por id
-userRouter.get("/find/:id", async (req, res) => {
+//Show a user by id
+userRouter.get("/find/:id", async (req, res, next) => {
     try {
         const { id } = req.params;
         const user = await User.findById(id).populate("gimnasio", "nombreCentro").populate("reservas");
@@ -167,7 +167,7 @@ userRouter.get("/find/:id", async (req, res) => {
     }
 })
 
-userRouter.put("/inscribirse/", async (req, res) => {
+userRouter.put("/inscribirse", async (req, res, next) => {
     try {
         const { id } = req.user;
 
@@ -208,7 +208,6 @@ userRouter.put("/inscribirse/", async (req, res) => {
                 })
             }
 
-
             const clases = await Class.findById(reservas);
             if (!clases) {
                 return next({
@@ -242,7 +241,7 @@ userRouter.put("/inscribirse/", async (req, res) => {
     }
 });
 
-userRouter.put("/delete/clase/", async (req, res) => {
+userRouter.put("/delete/clase/", async (req, res, next) => {
     try {
 
         const { id } = req.user;
@@ -271,7 +270,7 @@ userRouter.put("/delete/clase/", async (req, res) => {
         if (indice < 0) {
             return next({
                 succes: false,
-                message: "The user wasn't enrolled in that class!"
+                message: "The user isn't enrolled in that class!"
             })
         } else {
             usuario.reservas.splice(indice, 1);
