@@ -1,4 +1,3 @@
-//Creamos al gimnasio y encriptamos su contraseña
 const express = require("express");
 const Gym = require("../models/Gym");
 const Fees = require("../models/Fees");
@@ -8,39 +7,36 @@ const jwt = require("jsonwebtoken");
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-AuthRouterGym.post("/signup", async (req, res) => {
+AuthRouterGym.post("/signup", async (req, res, next) => {
     try {
         const { nombreCentro, password, direccion, entrenadores, cuotas, clases } = req.body;
 
-        //Los required, los controlamos
         if (!nombreCentro || !password) {
-            return res.status(403).json({
+            return next({
                 sucess: false,
-                mensaje: "Te has dejado el nombre o la contraseña!"
+                mensaje: "Required fields: nombreCentro, password!"
             })
         }
 
-        //que no este repetido el nombre del gym. aunque se sepa que es unico.
         const foundGymName = await Gym.findOne({ nombreCentro });
 
         if (foundGymName) {
-            return res.status(403).json({
+            return next({
                 sucess: false,
-                mensaje: "Ya existe un gimnasio con ese nombre!"
+                mensaje: "Already exists a gym with this name!"
             })
         }
 
         if (password) {
-            if (!password.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{6,1024}$/)) { //special/number/capital/8caracteres min))
-                return res.status(403).json({
+            if (!password.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{6,1024}$/)) { //special/number/capital/6 characters))
+                return next({
                     sucess: false,
-                    mensaje: "La contraseña debe contener 6 dígitos, mayusculas, minusculas y caracteres especiales!"
+                    mensaje: "The password must contain 6 dígits, uppercase, lowercase and special characters!"
                 })
             }
         }
 
-        const hash = await bcrypt.hash(password, 10); //hash la pasword ya codificada, esto encripta
-        //10 son las rounds, las vueltas que da para encriptarlo.
+        const hash = await bcrypt.hash(password, 10);
 
         const gym = new Gym({
             nombreCentro,
@@ -56,26 +52,25 @@ AuthRouterGym.post("/signup", async (req, res) => {
         return res.status(201).json({
             success: true,
             gym: newGym,
-            message: "Gym añadido a la BBDD"
+            message: "Gym created succesfully"
         })
 
     } catch (err) {
-        console.log(err);
-        return res.status(403).json({
-            success: false,
-            message: err.message || mensaje
-        })
+        return next({
+            status: 403,
+            message: err
+        });
     }
 })
 
-AuthRouterGym.post("/login", async (req, res) => {
+AuthRouterGym.post("/login", async (req, res, next) => {
     try {
         const { nombreCentro, password } = req.body;
 
         const gym = await Gym.findOne({ nombreCentro });
 
-        if (!gym) {  //Si no encuentra el nombre del centro, el usuario no existe
-            return res.status(401).json({
+        if (!gym) {
+            return next({
                 sucess: false,
                 message: "Wrong credentials!"
             })
@@ -84,7 +79,7 @@ AuthRouterGym.post("/login", async (req, res) => {
         const match = await bcrypt.compare(password, gym.password);   //desencripta la contraseña y mira a ver si es correcta
 
         if (!match) {
-            return res.status(401).json({
+            return next({
                 sucess: false,
                 message: "Wrong credentials!"
             })
@@ -99,10 +94,10 @@ AuthRouterGym.post("/login", async (req, res) => {
             token
         })
     } catch (err) {
-        return res.status(401).json({
-            sucess: false,
-            message: "Ha habido algun error con la verificacion! Acceso no permitido"
-        })
+        return next({
+            status: 403,
+            message: err
+        });
     }
 })
 

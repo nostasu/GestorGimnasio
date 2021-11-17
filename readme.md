@@ -54,13 +54,13 @@ Los gimnasios también tendrán acceso a quien ha reservado sus clases, y podrá
     3.  Buscar un gimnasio por su id. 
     Ruta --> api/gimnasios/find/:id✅
     4.  Actualizar los datos del gimnasio
-    Ruta -->/api/gimnasios/:id/update✅
-    5.  Borrar un gimnasio por id. 
+    Ruta -->/api/gimnasios/✅
+    5.  Borrar un gimnasio, tienes que estar conectado para poder borrarte. 
     Ruta --> /api/gimnasios/delete/:id ✅
     6.  Usuarios listados por cuota
-    Ruta --> /api/gimnasios/listarCuotas✅
+    Ruta --> /api/gimnasios/listarCuotas/:id✅
     7. Mostrar el nombre de todos los usuarios de un gimnasio
-    Ruta --> /api/gimnasios/:id/listaUsuarios✅ 
+    Ruta --> /api/gimnasios✅ 
 
 - A nivel de cuotas (Fees). Son todas privadas (nivel Gym) menos ver todas cuotas y mostrar una cuota por id
     1. Crear cuota.  Ruta--> /api/cuotas  (post)✅
@@ -73,7 +73,7 @@ Los gimnasios también tendrán acceso a quien ha reservado sus clases, y podrá
 ![ScreenShot](./GestorReservas.png)
  
 ## Versiones
-
+Version 1.0 sin FrontEnd, finalizada el 17/11/2021
 
 ## To do
 Me gustaría pasar toda la aplicación a inglés, incluidos mensajes de error, y optimizar las funciones.

@@ -7,34 +7,32 @@ const jwt = require("jsonwebtoken");
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-AuthRouter.post("/signup", async (req, res) => {
+AuthRouter.post("/signup", async (req, res, next) => {
     try {
         const { nombre, apellidos, telefono, email, password, fechaInicio, gimnasio, cuota, reservas } = req.body;
 
         if (!nombre || !apellidos || !email || !password || !gimnasio || !cuota) {
-            return res.status(403).json({
+            return next({
                 sucess: false,
-                message: "faltan datos"
+                message: "Required fields: nombre, apellidos, email, password, gimnasio, cuota"
             })
         }
 
-        //que no este repetido. aunque se sepa que es unico.
         const foundUser = await User.findOne({ email });
 
         if (foundUser) {
-            return res.status(403).json({
+            return next({
                 sucess: false,
-                message: "Hey! este mail ya esta registrado, prueba a hacer login!"
+                message: "Hey! The mail already exits! Try to login"
             })
         }
 
         const gymExiste = await Gym.findById(gimnasio);
-        //Al meter un usuario nuevo, comprobar que la cuota existe en el gym (gym.cuotas)
         if (gimnasio) {
             if (!gymExiste) {
-                return res.status(403).json({
+                return next({
                     sucess: false,
-                    message: "Hey!Ese gimnasio no existe!"
+                    message: `Hey! There isn't any gym with with this id: ${gimnasio}!`
                 })
             }
         }
@@ -44,22 +42,21 @@ AuthRouter.post("/signup", async (req, res) => {
             if (!existeCuota) {
                 return res.status(403).json({
                     success: false,
-                    message: "No se ha encontrado esa cuota para ese gimnasio!"
+                    message: `Hey! There isn't any fee in the gym ${gymExiste.nombreCentro} with with this id: ${gimnasio}!`
                 });
             }
         }
 
         if (password) {
-            if (!password.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{6,1024}$/)) { //special/number/capital/8caracteres min))
+            if (!password.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{6,1024}$/)) { //special/number/capital/6 characters min))
                 return res.status(403).json({
                     sucess: false,
-                    mensaje: "La contraseña debe contener 6 dígitos, mayusculas, minusculas y caracteres especiales!"
+                    mensaje: "The password must contain 6 dígits, uppercase, lowercase and special characters!"
                 })
             }
         }
 
-        const hash = await bcrypt.hash(password, 10); //hash la pasword ya codificada, esto encripta
-        //10 son las rounds, las vueltas que da para encriptarlo.
+        const hash = await bcrypt.hash(password, 10);
 
         const user = new User({
             nombre,
@@ -81,42 +78,49 @@ AuthRouter.post("/signup", async (req, res) => {
         })
 
     } catch (err) {
-        return res.status(403).json({
-            success: false,
-            message: err.message || message
-        })
+        return next({
+            status: 403,
+            message: err
+        });
     }
 })
 
-AuthRouter.post("/login", async (req, res) => {
-    const { email, password } = req.body;
+AuthRouter.post("/login", async (req, res, next) => {
+    try {
+        const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+        const user = await User.findOne({ email });
 
-    if (!user) {  //Si no encuentra el email, el usuario no existe
-        return res.status(401).json({
-            sucess: false,
-            message: "Wrong credentials!"
+        if (!user) {  //Si no encuentra el email, el usuario no existe
+            return next({
+                sucess: false,
+                message: "Wrong credentials!"
+            })
+        }
+
+        const match = await bcrypt.compare(password, user.password);   //desencripta la contraseña y mira a ver si es correcta
+
+        if (!match) {
+            return next({
+                sucess: false,
+                message: "Wrong credentials!"
+            })
+        }
+
+        //CREAR TOKEN
+        const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "96h" });
+
+        return res.status(200).json({
+            success: true,
+            message: `Welcome: ${user.nombre}, you're login!`,
+            token
         })
+    } catch (err) {
+        return next({
+            status: 403,
+            message: err
+        });
     }
-
-    const match = await bcrypt.compare(password, user.password);   //desencripta la contraseña y mira a ver si es correcta
-
-    if (!match) {
-        return res.status(401).json({
-            sucess: false,
-            message: "Wrong credentials!"
-        })
-    }
-
-    //CREAR TOKEN
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "96h" });  //Secret key, contraseña para abrir la cajita
-
-    return res.status(200).json({
-        success: true,
-        message: `Welcome: ${user.nombre}, you're login!`,
-        token
-    })
 })
 
 module.exports = AuthRouter;

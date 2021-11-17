@@ -6,8 +6,7 @@ const feeRouter = express.Router();
 
 feeRouter
     .route("/")
-    //Crear cuota
-    .post(checkToken, async (req, res) => {
+    .post(checkToken, async (req, res, next) => {
 
         try {
 
@@ -17,17 +16,16 @@ feeRouter
             const gym = await Gym.findById(id);
 
             if (!gym) {
-                return res.status(403).json({
+                return next({
                     sucess: false,
-                    mensaje: "Debe estar logueado como gym para poder crear sus cuotas!"
+                    mensaje: "You have to login as a Gym if you want to create a new fee!"
                 })
             }
 
-            //Los required, los controlamos
             if (!precio || !clases) {
-                return res.status(403).json({
+                return next({
                     sucess: false,
-                    mensaje: "Los dos campos son obligatorios!"
+                    mensaje: "Fields required: precio, clases"
                 })
             }
 
@@ -47,124 +45,136 @@ feeRouter
             })
 
         } catch (err) {
-            console.log(err);
-            return res.status(403).json({
-                succes: false,
-                message: err.message
+            return next({
+                status: 403,
+                message: err
             });
-        };
+        }
     })
     //Encuentra todos
-    .get(async (req, res) => {
+    .get(async (req, res, next) => {
         try {
-            Fees.find({}, (err, fees) => {
-                if (err) {
-                    res.status(400).send(err.response.data);
-                }
-                res.json(fees);
-            });
+            const fees = await Fees.find({});
+            if (!fees) {
+                return next({
+                    success: false,
+                    message: "There isn't any fee yet"
+                })
+            }
+
+            return res.status(201).json({
+                success: true,
+                fees
+            })
 
         } catch (err) {
-            console.log(err);
-            return res.status(400).json({
-                succes: false,
-                message: err.message
-            })
+            return next({
+                status: 403,
+                message: err
+            });
         }
     });
 
 feeRouter
-    .route("/fees")
-    //Mostrar 1 cuota por id
-    .get(async (req, res) => {
+    .route("/:id")
+    .get(async (req, res, next) => {
         try {
-            const { id } = req.body;
+            const { id } = req.params;
             const cuota = await Fees.findById(id);
             if (!cuota) {
-                return res.status(404).json({
-                    sucess: false,
-                    message: "No existe ninguna cuota con esa id"
+                return next({
+                    success: false,
+                    message: `There isn't any fee with the id: ${id}`
                 })
             }
-            return res.json({
+            return res.status(201).json({
                 success: true,
                 cuota
             })
         } catch (err) {
-            return res.status(403).json({
-                success: false,
-                message: err.message
+            next({
+                status: 403,
+                message: "Something went wrong...!"
             });
         }
     })
     //Eliminar cuota
-    .delete(checkToken, async (req, res) => {
-        const { id } = req.user;
-        const { idCuota } = req.body;
+    .delete(checkToken, async (req, res, next) => {
+        const idGym = req.user.id;
+        const { id } = req.params;
 
         try {
-            const gymLogin = await Gym.findById(id);
-            const gym = await Gym.find({ cuotas: idCuota });
-
+            const gymLogin = await Gym.findById(idGym);
+            const gym = await Gym.find({ cuotas: id });
+            if (gym.length == 0) {
+                return next({
+                    sucess: false,
+                    message: `Your gym doesn't have a fee with id: ${id}`
+                })
+            }
             if (gym[0].nombreCentro != gymLogin.nombreCentro) {
-                return res.status(403).json({
+                return next({
                     sucess: false,
-                    mensaje: "Debe estar conectado como gym y debe ser una de sus cuotas!"
+                    mensaje: "You have to login as a gym to delete one of your fees!"
                 })
             }
 
-            let fee = await Fees.findById(idCuota);
+            let fee = await Fees.findById(id);
             if (!fee) {
-                return res.status(404).json({
+                return next({
                     sucess: false,
-                    message: "No existe ninguna cuota con esta id"
+                    message: `There isn't any fee with the id ${id}`
                 })
             }
-            await Fees.findByIdAndDelete(idCuota);
+            await Fees.findByIdAndDelete(id);
 
             if (gym) {
                 gym.forEach(async cuotaGym => {
-                    let i = cuotaGym.cuotas.indexOf(idCuota);
-                    if (i > -1) { //No quiero que saque -1 (no encontrado) y borre alguna
+                    let i = cuotaGym.cuotas.indexOf(id);
+                    if (i > -1) {
                         cuotaGym.cuotas.splice(i, 1);
                         await cuotaGym.save();
                     }
                 })
             }
 
-            const foundUser = await User.findOne({ cuota: idCuota });
+            const foundUser = await User.findOne({ cuota: id });
 
             if (foundUser) {
                 foundUser.cuota = null;
                 await foundUser.save();
             }
 
-            return res.send(`Se ha borrado de la BBDD la cuota con id ${idCuota}, avisar al usuario: ${foundUser} para que modifique su cuota`);
+            return res.status(201).json({
+                success: true,
+                message: `The fee with the id: ${id} is deleted, warn the user: ${foundUser}, had to modify the cuote!`
+            })
 
         } catch (err) {
-            return res.status(403).json({
-                success: false,
-                message: err.message || message
+            return next({
+                status: 403,
+                message: err
             });
         }
     })
     //Actualizar cuota
-    .put(checkToken, async (req, res) => {
+    .put(checkToken, async (req, res, next) => {
         try {
-            const { id } = req.user;
-            const { idCuota, precio, clases } = req.body;
+            const idGym = req.user.id;
+            const { id } = req.params;
+            const { precio, clases } = req.body;
 
-            const gymLogin = await Gym.findById(id);
-            const cuotaExisteGym = await Gym.find({ cuotas: idCuota });
+            const gymLogin = await Gym.findById(idGym);
+            const cuotaExisteGym = await Gym.find({ cuotas: id });
 
             if (cuotaExisteGym[0].nombreCentro != gymLogin.nombreCentro) {
-                return res.status(403).json({
+                return next({
                     sucess: false,
-                    mensaje: "Debe estar conectado como gym y debe ser una de sus cuotas!"
+                    mensaje: "It must be connected as a gym and it neccesary be one of your fees!"
                 })
             }
 
-            let cuota = await Fees.findById(idCuota);
+            let cuota = await Fees.findById(id);
 
             if (precio) {
                 cuota.precio = precio;
@@ -174,15 +184,15 @@ feeRouter
             }
 
             const cuotaUpdate = await cuota.save();
-            return res.json({
+            return res.status(200).json({
                 sucess: true,
                 cuotaUpdate
             })
 
         } catch (err) {
-            return res.status(403).json({
-                success: false,
-                message: err.message
+            return next({
+                status: 403,
+                message: err
             });
         }
     })

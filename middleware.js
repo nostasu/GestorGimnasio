@@ -23,7 +23,7 @@ let checkToken = async (req, res, next) => {
 
         console.log(decoded);
 
-        req.user = decoded;  //como si req fuera un objeto
+        req.user = decoded;
         next();
     } catch (err) {
         console.log(err);
@@ -33,5 +33,15 @@ let checkToken = async (req, res, next) => {
         })
     }
 };
+const errorHandler = (err, req, res, next) => {
+    if (res.headersSent) {
+        return next(err);
+    }
+    console.error(err);
+    res.status(err.status || 400).send({
+        success: false,
+        message: err._message || err.message
+    });
+};
 
-module.exports = { checkToken };
+module.exports = { checkToken, errorHandler };

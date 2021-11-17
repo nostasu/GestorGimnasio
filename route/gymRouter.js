@@ -7,20 +7,19 @@ const gymRouter = express.Router();
 
 gymRouter
     .route("/")
-    //Muestra el nombre de todos los usuarios del gimnasio login
-    .get(checkToken, async (req, res) => {
+    //Shows the name of all the users in the gym.
+    .get(checkToken, async (req, res, next) => {
         try {
             const { id } = req.user; //La id del gym que esta conectado
 
             let gym = await Gym.findById(id);
             if (!gym) {
-                return res.status(404).json({
+                return next({
                     sucess: false,
-                    message: "No existe ningun gimnasio con esta id"
+                    message: "There isn'n any gym with this id"
                 })
             }
 
-            //existe el gimnasio, mostramos sus usuarios
             const usuariosGym = await Users.find().populate("gimnasio", "nombreCentro");
 
             const usFiltrados = usuariosGym.filter(user => {
@@ -30,26 +29,26 @@ gymRouter
             });
 
             if (usFiltrados.length == 0) {
-                return res.status(404).json({
+                return next({
                     sucess: false,
-                    message: "No hay ningun usuario asociado a este gym"
+                    message: "This gym has no users yet"
                 })
             }
 
-            return res.json({
+            return res.status(201).json({
                 success: true,
                 usFiltrados
             })
 
         } catch (err) {
-            return res.status(403).json({
-                success: false,
-                message: err.message
+            return next({
+                status: 403,
+                message: err
             });
         }
     })
-    //Actualizacion de los datos del gimnasio
-    .put(checkToken, async (req, res) => {
+    //Updating the gym
+    .put(checkToken, async (req, res, next) => {
         try {
             const { id } = req.user  //La id del gimnasio
 
@@ -57,9 +56,9 @@ gymRouter
 
             let gym = await Gym.findById(id);
             if (!gym) {
-                return res.status(404).json({
+                return next({
                     sucess: false,
-                    message: "No existe ningun gimnasio con esta id"
+                    message: "There isn't any gym with this id"
                 })
             }
 
@@ -71,39 +70,38 @@ gymRouter
             }
 
             const gymUpdate = await gym.save();
-            return res.json({
+            return res.status(201).json({
                 sucess: true,
                 gymUpdate
             })
 
         } catch (err) {
-            return res.status(403).json({
-                success: false,
-                message: err.message
+            return next({
+                status: 403,
+                message: err
             });
         }
     })
 
-    //Eliminar un gimnasio
-    .delete(checkToken, async (req, res) => {
+    .delete(checkToken, async (req, res, next) => {
         try {
             const { id } = req.user;
 
             let gymBorrado = await Gym.findById(id);
             if (!gymBorrado) {
-                return res.status(404).json({
+                return next({
                     sucess: false,
-                    message: "No existe ningun gimnasio con esta id"
+                    message: "There isn't any gym with this id"
                 })
             }
 
-            //Borrar en Clases las clases en las que se impartian en ese gym
+            //Delete all the classes of the model Classes that are created by the gym
             gymBorrado.clases.forEach(async claseBorrar => {
                 let clase = await Class.findByIdAndDelete(claseBorrar._id);
-                console.log(`Clase borrada: ${clase}`);
+                console.log(`Class deleted: ${clase} successfully`);
             })
 
-            //Borrar el campo reservas (ya que todas van a ser de ese Gym), cuota y gym al usuario que estuviera en ese gimnasio
+            //Delete the field reservas, cuota y gym to the users of the gym
             let usuarios = await Users.find({ gimnasio: id });
             usuarios.forEach(async user => {
                 user.gimnasio = null;
@@ -112,116 +110,105 @@ gymRouter
                 await user.save();
             });
 
-            //Borrar en Fees todas sus cuotas
+            //Delete in Fees all the Fees created by the gym
             gymBorrado.cuotas.forEach(async cuotaGym => {
                 await Fees.findByIdAndDelete(cuotaGym);
             })
             await Gym.findByIdAndDelete(id);
 
-            return res.json({
+            return res.status(201).json({
                 sucess: true,
-                message: `Se ha borrado de la BBDD el gimnasio con id ${id}`
+                message: `Gym deleted: ${id} successfully`
             });
 
         } catch (err) {
-            return res.status(403).json({
-                success: false,
-                message: err.message
+            return next({
+                status: 403,
+                message: err
             });
         }
     });
 
 
-//Encuentra un gimnasio por id //no es necesario estar login
-gymRouter.get("/find/", async (req, res) => {
+//Find a gym
+gymRouter.get("/find/:id", async (req, res, next) => {
     try {
-        const { id } = req.body
+        const { id } = req.params
         const gym = await Gym.findById(id);
         if (!gym) {
-            return res.status(404).json({
+            return next({
                 sucess: false,
-                message: "No existe ningun gimnasio con esta id"
+                message: `There isn't any gym with this id: ${id}`
             })
         }
-        return res.json({
+        return res.status(201).json({
             success: true,
             gym
         })
     } catch (err) {
-        console.log(err);
-        return res.status(403).json({
-            success: false,
-            message: err.message
+        return next({
+            status: 403,
+            message: err
         });
     }
 })
 
-//Mostrar todos gym con todos datos (populate);
-//Encuentra todos y muestra todo (populate)
-gymRouter.get("/allGyms", async (req, res) => {
+//Show all the gyms
+gymRouter.get("/allGyms", async (req, res, next) => {
     try {
         let gyms = await Gym.find().populate("cuotas").populate("clases", "tipoClase");
 
         if (!gyms) {
-            return res.status(403).json({
+            return next({
                 success: false,
-                message: "Todavia no hay ningun gym en nuestra BBDD"
+                message: "There isn't any gym"
             });
         }
-        return res.json({
+        return res.status(200).json({
             sucess: true,
             gyms
         })
 
     } catch (err) {
-        console.log(err);
-        return res.status(403).json({
-            success: false,
-            message: err.message
+        return next({
+            status: 403,
+            message: err
         });
     }
 })
 
-//Usuarios listados por cuota, es necesario indicar por params una cuota
-gymRouter.get("/listarCuotas", checkToken, async (req, res) => {
+//Users filter by a Fee, it's necesary give in params a Fee
+gymRouter.get("/listarCuotas/:id", checkToken, async (req, res, next) => {
     try {
         const { id } = req.user;
-        const { cuotas } = req.body;
+        const cuotas = req.params.id;
 
         let gymCuotas = await Gym.findById(id);
         if (!gymCuotas) {
-            return res.status(404).json({
+            return next({
                 sucess: false,
-                message: "No existe ningun gimnasio con esta id"
+                message: `There isn't any gym with the id: ${id}`
             })
         } else {
-            if (cuotas) {
-                //buscamos los usuarios que tienen esa cuota
-                const usuariosCuota = await Users.find();
+            //buscamos los usuarios que tienen esa cuota
+            const usuariosCuota = await Users.find().select("nombre apellidos cuota");
 
-                const usFiltrados = usuariosCuota.filter(user => {
-                    if (user.cuota.equals(cuotas) && user.gimnasio.equals(id)) {
-                        return user
-                    }
-                });
+            const usFiltrados = usuariosCuota.filter(user => {
+                if (user.cuota.equals(cuotas)) {
+                    return user
+                }
+            });
 
-                return res.json({
-
-                    success: true,
-                    usFiltrados
-
-                })
-            } else {
-                return res.status(404).json({
-                    sucess: false,
-                    message: "El gimnasio que ha indicado no tiene esa cuota"
-                })
-            }
+            return res.status(201).json({
+                success: true,
+                usFiltrados
+            })
         }
+
     } catch (err) {
-        return res.status(403).json({
-            success: false,
-            message: err.message
+        return next({
+            status: 403,
+            message: err
         });
     }
 })
