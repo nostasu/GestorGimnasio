@@ -5,6 +5,7 @@ const Class = require("../models/Class");
 const userRouter = express.Router();
 
 userRouter.route("/")
+    //Create a user
     .get(async (req, res, next) => {
         try {
             let users = await User.find({});
@@ -26,7 +27,7 @@ userRouter.route("/")
             });
         }
     })
-
+    //Update a user
     .put(async (req, res, next) => {
         try {
             const { id } = req.user;
@@ -64,14 +65,11 @@ userRouter.route("/")
                 }
             }
 
-            //Fecha inicio
             if (fechaInicio) {
                 usuario.fechaInicio = fechaInicio;
             }
 
-            //gimnasio
             if (gimnasio) {
-                //Primero, comprobamos que el gimnasio existe
                 if (gymExiste) {
                     usuario.gimnasio = gimnasio;
                 } else {
@@ -82,7 +80,6 @@ userRouter.route("/")
                 }
             }
 
-            //cuota, tenemos el gym en gym en gymExiste, comprobar si tiene esa cuota
             if (cuota) {
                 if (gymExiste) {
                     let existeCuota = gymExiste.cuotas.find(cuotaGym => cuotaGym.equals(cuota));
@@ -91,7 +88,7 @@ userRouter.route("/")
                     } else {
                         return next({
                             success: false,
-                            message: ` The gym ${gymExiste.nombre} doesn't have this fee!`
+                            message: ` The gym ${gymExiste.nombreCentro} doesn't have this fee!`
                         });
                     }
                 }
@@ -110,7 +107,7 @@ userRouter.route("/")
             });
         }
     })
-    //Eliminar usuario
+    //Delete user
     .delete(async (req, res, next) => {
         try {
 
@@ -133,6 +130,7 @@ userRouter.route("/")
 
             return res.status(201).json({
                 sucess: true,
+                message: "User has been removed successfully",
                 usuario
             });
 
@@ -186,7 +184,7 @@ userRouter.put("/inscribirse", async (req, res, next) => {
                 succes: false,
                 message: "You have already wasted all your classes!"
             })
-        } else {
+        } else { //borrar else
             if (usuario.reservas.includes(reservas)) {
                 return next({
                     succes: false,
@@ -275,7 +273,6 @@ userRouter.put("/delete/clase/", async (req, res, next) => {
         } else {
             usuario.reservas.splice(indice, 1);
             await usuario.save();
-            //ahora en clases, borramos clases.reservas el id del usario
             let indiceAlumno = clase.alumnosInscritos.findIndex(alumno => alumno.equals(id));
             clase.alumnosInscritos.splice(indiceAlumno, 1);
             clase.save();
@@ -283,7 +280,7 @@ userRouter.put("/delete/clase/", async (req, res, next) => {
 
         return res.status(201).json({
             sucess: true,
-            usuario
+            message: "Your class has been deleted!"
         });
 
     } catch (err) {

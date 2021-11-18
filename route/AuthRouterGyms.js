@@ -86,7 +86,7 @@ AuthRouterGym.post("/login", async (req, res, next) => {
         }
 
         //CREAR TOKEN
-        const token = jwt.sign({ id: gym._id }, JWT_SECRET, { expiresIn: "96h" });  //Secret key, contraseña para abrir la cajita
+        const token = jwt.sign({ id: gym._id }, JWT_SECRET, { expiresIn: "96h" });
 
         return res.status(200).json({
             success: true,

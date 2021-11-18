@@ -10,7 +10,7 @@ gymRouter
     //Shows the name of all the users in the gym.
     .get(checkToken, async (req, res, next) => {
         try {
-            const { id } = req.user; //La id del gym que esta conectado
+            const { id } = req.user;
 
             let gym = await Gym.findById(id);
             if (!gym) {
@@ -20,7 +20,7 @@ gymRouter
                 })
             }
 
-            const usuariosGym = await Users.find().populate("gimnasio", "nombreCentro");
+            const usuariosGym = await Users.find().populate("gimnasio", "nombreCentro").select("nombre apellidos gimnasio");
 
             const usFiltrados = usuariosGym.filter(user => {
                 if (user.gimnasio.equals(id)) {
@@ -190,7 +190,7 @@ gymRouter.get("/listarCuotas/:id", checkToken, async (req, res, next) => {
                 message: `There isn't any gym with the id: ${id}`
             })
         } else {
-            //buscamos los usuarios que tienen esa cuota
+
             const usuariosCuota = await Users.find().select("nombre apellidos cuota");
 
             const usFiltrados = usuariosCuota.filter(user => {
@@ -198,6 +198,13 @@ gymRouter.get("/listarCuotas/:id", checkToken, async (req, res, next) => {
                     return user
                 }
             });
+
+            if (usFiltrados.length == 0) {
+                return next({
+                    sucess: false,
+                    message: `There isn't any user with the fee id: ${cuotas}`
+                })
+            }
 
             return res.status(201).json({
                 success: true,

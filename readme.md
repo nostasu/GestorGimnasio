@@ -76,4 +76,9 @@ Los gimnasios también tendrán acceso a quien ha reservado sus clases, y podrá
 Version 1.0 sin FrontEnd, finalizada el 17/11/2021
 
 ## To do
-Me gustaría pasar toda la aplicación a inglés, incluidos mensajes de error, y optimizar las funciones.
+1. Me gustaría pasar toda la aplicación a inglés,
+2. Optimizar las funciones
+3. Imagenes gym para logo
+4. Modificar error de apuntarse a una clase, en lugar de mirarlo semanalmente, tiene que ser mensual y no borrar las clases.
+5. fee indicar un nombre de cuota basica, premium, pro
+6. eliminar las contraseñas de las pruebas que no interesen

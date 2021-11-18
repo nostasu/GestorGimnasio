@@ -5,14 +5,13 @@ const JWT_SECRET = process.env.JWT_SECRET;
 let checkToken = async (req, res, next) => {
     try {
         //El token lo recibimos en postman, lo enviamos en authorization (typeBearerToken) 
-        //Lo mandaremos a traves del header
         let token = req.headers["x-acces-token"] || req.headers["authorization"];
 
         if (token && token.startsWith("Bearer")) {
-            token = token.slice(7, token.lenght)  //Remove Bearer de la String
+            token = token.slice(7, token.lenght)
         }
 
-        if (!token) {  //Si no hay token, me mandas un error
+        if (!token) {
             return res.status(401).json({
                 success: false,
                 message: "token not found"

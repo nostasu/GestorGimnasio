@@ -91,14 +91,14 @@ AuthRouter.post("/login", async (req, res, next) => {
 
         const user = await User.findOne({ email });
 
-        if (!user) {  //Si no encuentra el email, el usuario no existe
+        if (!user) {
             return next({
                 sucess: false,
                 message: "Wrong credentials!"
             })
         }
 
-        const match = await bcrypt.compare(password, user.password);   //desencripta la contraseña y mira a ver si es correcta
+        const match = await bcrypt.compare(password, user.password);
 
         if (!match) {
             return next({

@@ -98,7 +98,7 @@ classRouter
 
             var fechaActualMiliseg = Date.now();
             let horasCorrectas = new Date(fechaActualMiliseg);
-            fechaActualMiliseg = horasCorrectas.setHours(horasCorrectas.getHours());
+            fechaActualMiliseg = horasCorrectas.setHours(horasCorrectas.getHours() + 1);
 
             const hoy = new Date(fechaActualMiliseg);
 
@@ -125,7 +125,6 @@ classRouter
             return res.status(200).json({
                 success: true,
                 message: "Las clases se han actualizado correctamente, ya puede realizar sus reservas"
-
             })
 
         } catch (err) {
