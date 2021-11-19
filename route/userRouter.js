@@ -5,14 +5,14 @@ const Class = require("../models/Class");
 const userRouter = express.Router();
 
 userRouter.route("/")
-    //Create a user
+    //show all users
     .get(async (req, res, next) => {
         try {
-            let users = await User.find({});
+            let users = await User.find({}).select("-password");;
             if (!users) {
                 return next({
                     success: false,
-                    message: `There isn't any user with this id!`
+                    message: `There isn't any user!`
                 })
             }
             res.status(201).json({
@@ -36,7 +36,7 @@ userRouter.route("/")
 
             const gymExiste = await Gym.findById(gimnasio);
 
-            let usuario = await User.findById(id);
+            let usuario = await User.findById(id).select("-password");
 
             if (nombre) {
                 usuario.nombre = nombre;
@@ -169,67 +169,89 @@ userRouter.put("/inscribirse", async (req, res, next) => {
     try {
         const { id } = req.user;
 
-        const usuario = await User.findById(id).populate("gimnasio");
+        const usuario = await User.findById(id).populate("gimnasio", "-password").select("-password");
 
         if (!usuario) {
             return next({
                 succes: false,
-                message: "User validation failed!"
+                message: "You have to login as a user!"
             })
         }
         const { reservas } = req.body;
 
-        if (usuario.reservas.length > usuario.cuota.clases) {
+        let existeClaseGym = await Gym.find({ clases: reservas });
+        console.log(existeClaseGym);
+
+        if (!existeClaseGym) {
             return next({
                 succes: false,
-                message: "You have already wasted all your classes!"
+                message: "There isn't such class in your gym!"
             })
-        } else { //borrar else
-            if (usuario.reservas.includes(reservas)) {
+        }
+        const clases = await Class.findById(reservas);
+        if (!clases) {
+            return next({
+                succes: false,
+                message: "That class doesn't exists"
+            })
+        }
+        if (clases.maxAlumnos <= clases.alumnosInscritos.length) {
+            return next({
+                succes: false,
+                message: "You can't join that class, it's full!"
+            })
+        }
+
+        let fechaActual = new Date();
+        let mes = fechaActual.getMonth() + 1;
+        let año = fechaActual.getFullYear();
+        let fechaClase = new Date(clases.fechaHora);
+        let mesClase = fechaClase.getMonth() + 1;
+        let yearClase = fechaClase.getFullYear();
+        let dayClase = fechaClase.getDay();  //Si la fecha de la clase COINCIDE con el dia de la reserva
+
+        let reservasMes = 0;
+        //Calcular las reservas que tiene el usuario ESE MES de ESE AÑO
+        usuario.reservas.forEach(clase => {
+            let añoReserva = fechaActual.getFullYear();
+            let mesReserva = clase.fechaClase.getMonth() + 1;
+            let dayReserva = clase.fechaClase.getDay();
+            if (clase.clase === reservas && año === añoReserva && dayClase === dayReserva) {
                 return next({
                     succes: false,
                     message: "You have already signed up in that class!"
                 })
             }
+            if (mes === mesReserva && año === añoReserva) {
+                reservasMes++;
+            }
+        });
 
-            let existeClaseGym = false;
-            for (let i = 0; i < usuario.gimnasio.clases.length; i++) {
-                if (usuario.gimnasio.clases[i] == reservas) {
-                    existeClaseGym = true;
-                }
-            }
+        let cuotaUser = await Fees.findById(usuario.cuota);
 
-            if (!existeClaseGym) {
-                return next({
-                    succes: false,
-                    message: "There isn't such class in your gym!"
-                })
-            }
+        console.log(`mes : ${mesClase} año ${yearClase}`);
 
-            const clases = await Class.findById(reservas);
-            if (!clases) {
-                return next({
-                    succes: false,
-                    message: "That class doesn't exists"
-                })
-            }
-            if (clases.maxAlumnos <= clases.alumnosInscritos.length) {
-                return next({
-                    succes: false,
-                    message: "You can't join that class, it's full!"
-                })
-            } else if (existeClaseGym) {
-                usuario.reservas.push(reservas);
-                clases.alumnosInscritos.push(usuario.id);
-            }
-            const userUpdate = await usuario.save();
-            const classUpdate = await clases.save();
-            return res.status(201).json({
-                sucess: true,
-                userUpdate,
-                classUpdate
+        if (reservasMes >= cuotaUser.clases && mes == mesClase && año == yearClase) {
+            return next({
+                succes: false,
+                message: "You have already wasted all your classes!"
             })
         }
+
+        let reservaUsuario = {
+            clase: clases.id,
+            fechaClase: clases.fechaHora
+        }
+        usuario.reservas.push(reservaUsuario);
+        clases.alumnosInscritos.push(id);
+
+        const userUpdate = await usuario.save();
+        const classUpdate = await clases.save();
+
+        return res.status(201).json({
+            sucess: true,
+            userUpdate
+        })
 
     } catch (err) {
         return next({
@@ -263,8 +285,12 @@ userRouter.put("/delete/clase/", async (req, res, next) => {
         }
 
         console.log(usuario.reservas);
+        //Coger mes y año de la "reservas"
 
-        let indice = usuario.reservas.findIndex(reserva => reserva.equals(reservas));
+        let indice = usuario.reservas.findIndex(reserva => {
+            return reserva.clase.equals(reservas) &&
+                clase.fechaHora.getTime() == reserva.fechaClase.getTime()
+        });
         if (indice < 0) {
             return next({
                 succes: false,
@@ -281,6 +307,40 @@ userRouter.put("/delete/clase/", async (req, res, next) => {
         return res.status(201).json({
             sucess: true,
             message: "Your class has been deleted!"
+        });
+
+    } catch (err) {
+        return next({
+            status: 403,
+            message: err
+        });
+    }
+});
+
+//Mostrar mis reservas
+userRouter.get("/misReservas", async (req, res, next) => {
+    try {
+
+        const { id } = req.user;
+
+        const usuario = await User.findById(id).select("-password").sort();
+        if (!usuario) {
+            return next({
+                succes: false,
+                message: "User conecction failed"
+            })
+        }
+
+        if (usuario.reservas.length == 0) {
+            return next({
+                succes: false,
+                message: "El usuario todavia no tiene reservas!"
+            })
+        }
+
+        return res.status(201).json({
+            sucess: true,
+            usuario
         });
 
     } catch (err) {

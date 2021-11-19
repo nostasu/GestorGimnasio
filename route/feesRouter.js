@@ -11,7 +11,7 @@ feeRouter
         try {
 
             const { id } = req.user;
-            const { precio, clases } = req.body;
+            const { nombre, precio, clases } = req.body;
 
             const gym = await Gym.findById(id);
 
@@ -22,15 +22,15 @@ feeRouter
                 })
             }
 
-            if (!precio || !clases) {
+            if (!nombre || !precio || !clases) {
                 return next({
                     sucess: false,
-                    message: "Fields required: precio, clases"
+                    message: "Fields required: nombre, precio, clases"
                 })
             }
 
             let fees = new Fees({
-                precio, clases
+                nombre, precio, clases
             });
 
             const newFee = await fees.save();

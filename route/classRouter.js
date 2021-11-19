@@ -111,11 +111,11 @@ classRouter
                     newDate = clase.fechaHora.setDate(clase.fechaHora.getDate() + 7);
                     claseCambiar.fechaHora = newDate;
 
-                    claseCambiar.alumnosInscritos.forEach(async alumn => {
-                        const alumno = await User.findById(alumn._id);
-                        alumno.reservas.remove(claseCambiar._id);
-                        await alumno.save();
-                    });
+                    // claseCambiar.alumnosInscritos.forEach(async alumn => {
+                    //     const alumno = await User.findById(alumn._id);
+                    //     alumno.reservas.remove(claseCambiar._id);
+                    //     await alumno.save();
+                    // });
 
                     claseCambiar.alumnosInscritos = [];
                     await claseCambiar.save();

@@ -82,3 +82,4 @@ Version 1.0 sin FrontEnd, finalizada el 17/11/2021
 4. Modificar error de apuntarse a una clase, en lugar de mirarlo semanalmente, tiene que ser mensual y no borrar las clases.
 5. fee indicar un nombre de cuota basica, premium, pro
 6. eliminar las contraseñas de las pruebas que no interesen
+7. gym admin?

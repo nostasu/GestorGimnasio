@@ -36,10 +36,17 @@ const userSchema = new Schema({
         ref: "Fees" //Crear modelo
     },
 
-    //Indicar el maximo de las reservas
     reservas: [{
-        type: mongoose.Types.ObjectId,
-        ref: "Class"
+        nombreClase: {
+            type: String
+        },
+        clase: {
+            type: mongoose.Types.ObjectId,
+            ref: "Class"
+        },
+        fechaClase: {
+            type: Date
+        }
     }]
 })
 
