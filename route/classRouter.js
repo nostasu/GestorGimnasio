@@ -111,11 +111,6 @@ classRouter
                     newDate = clase.fechaHora.setDate(clase.fechaHora.getDate() + 7);
                     claseCambiar.fechaHora = newDate;
 
-                    // claseCambiar.alumnosInscritos.forEach(async alumn => {
-                    //     const alumno = await User.findById(alumn._id);
-                    //     alumno.reservas.remove(claseCambiar._id);
-                    //     await alumno.save();
-                    // });
 
                     claseCambiar.alumnosInscritos = [];
                     await claseCambiar.save();
@@ -221,8 +216,24 @@ classRouter.delete("/delete/:id", checkToken, async (req, res, next) => {
                 message: "Hey! You have to login as a gym to delete one of your classes!"
             });
         }
+
         gym.clases.remove(id);
         gym.save();
+
+        if (claseABorrar.alumnosInscritos.length != 0) {
+            //hay alumnos inscritos en esa clase, borrar de su array de reservas la clase
+            claseABorrar.alumnosInscritos.forEach(alumno => {
+                const usuario = await User.findById(alumno);
+                let indice = usuario.reservas.findIndex(reserva => {
+                    return reserva.clase.equals(claseABorrar) &&
+                        claseABorrar.fechaHora.getTime() == reserva.fechaClase.getTime()
+                });
+                usuario.reservas.splice(indice, 1);
+                await usuario.save();
+            })
+        }
+
+        //buscar si hay algun alumno con esa clase y borrarlo
 
         return res.status(200).json({
             success: true,
