@@ -222,7 +222,7 @@ classRouter.delete("/delete/:id", checkToken, async (req, res, next) => {
 
         if (claseABorrar.alumnosInscritos.length != 0) {
             //hay alumnos inscritos en esa clase, borrar de su array de reservas la clase
-            claseABorrar.alumnosInscritos.forEach(alumno => {
+            claseABorrar.alumnosInscritos.forEach(async alumno => {
                 const usuario = await User.findById(alumno);
                 let indice = usuario.reservas.findIndex(reserva => {
                     return reserva.clase.equals(claseABorrar) &&

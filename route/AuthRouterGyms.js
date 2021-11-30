@@ -4,13 +4,16 @@ const Fees = require("../models/Fees");
 const AuthRouterGym = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const cloudinary = require('../cloudinary/cloudinary');
+const upload = require('../cloudinary/multer');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-AuthRouterGym.post("/signup", async (req, res, next) => {
+AuthRouterGym.post("/signup", upload.single("logo"), async (req, res, next) => {
     try {
-        const { nombreCentro, password, direccion, entrenadores, cuotas, clases } = req.body;
-
+        const result = await cloudinary.uploader.upload(req.file.path);
+        // const { nombreCentro, password, direccion, entrenadores, cuotas, clases } = req.body;
+        const { nombreCentro, password, direccion, logo, cloudinary_id, entrenadores, cuotas, clases } = req.body;
         if (!nombreCentro || !password) {
             return next({
                 sucess: false,
@@ -38,10 +41,14 @@ AuthRouterGym.post("/signup", async (req, res, next) => {
 
         const hash = await bcrypt.hash(password, 10);
 
+        console.log(result);
+
         const gym = new Gym({
             nombreCentro,
             password: hash,
             direccion,
+            logo: result.secure_url,
+            cloudinary_id: result.public_id,
             entrenadores,
             cuotas,
             clases,

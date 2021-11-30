@@ -12,11 +12,16 @@ const gymSchema = new Schema({
         required: true,
     },
     direccion: String,
-    //logo: img,
+    logo: {
+        type: String
+    },
+    cloudinary_id: {
+        type: String
+    },
     entrenadores: [{
         nombreApellidos: {
             type: String,
-            required: true
+            // required: true
         },
         edad: Number
     }],

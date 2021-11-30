@@ -3,6 +3,7 @@ const Gym = require("../models/Gym"); //requerimos el export
 const Users = require("../models/User");
 const Class = require("../models/Class");
 const { checkToken } = require("../middleware");
+const cloudinary = require('../cloudinary/cloudinary');
 const gymRouter = express.Router();
 
 gymRouter
@@ -94,6 +95,7 @@ gymRouter
                     message: "There isn't any gym with this id"
                 })
             }
+            await cloudinary.uploader.destroy(gymBorrado.cloudinary_id);
 
             //Delete all the classes of the model Classes that are created by the gym
             gymBorrado.clases.forEach(async claseBorrar => {
