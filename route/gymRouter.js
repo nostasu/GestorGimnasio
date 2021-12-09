@@ -83,7 +83,7 @@ gymRouter
             });
         }
     })
-
+    //delete gym
     .delete(checkToken, async (req, res, next) => {
         try {
             const { id } = req.user;
@@ -222,4 +222,53 @@ gymRouter.get("/listarCuotas/:id", checkToken, async (req, res, next) => {
     }
 })
 
+//all the classes of the gym login
+gymRouter.get("/clasesGym", checkToken, async (req, res, next) => {
+    try {
+        const { id } = req.user;
+
+        let gym = await Gym.findById(id).select("clases").populate("clases");
+        if (!gym) {
+            return next({
+                sucess: false,
+                message: `There isn't any gym with the id: ${id}`
+            })
+        }
+
+        return res.status(201).json({
+            success: true,
+            gym
+        })
+
+    } catch (err) {
+        return next({
+            status: 403,
+            message: err
+        });
+    }
+})
+//Show all the classes
+
+//find my gym connected
+gymRouter.get("/myGym", checkToken, async (req, res, next) => {
+    try {
+        const { id } = req.user;
+        const gym = await Gym.findById(id);
+        if (!gym) {
+            return next({
+                sucess: false,
+                message: `There isn't any gym with this id: ${id}`
+            })
+        }
+        return res.status(201).json({
+            success: true,
+            gym
+        })
+    } catch (err) {
+        return next({
+            status: 403,
+            message: err
+        });
+    }
+})
 module.exports = gymRouter;

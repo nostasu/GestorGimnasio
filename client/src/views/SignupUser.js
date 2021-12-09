@@ -1,12 +1,32 @@
 import React from 'react';
+import axios from "axios";
+import { useNavigate } from 'react-router-dom';
+import FormUser from "../components/FormUser";
+
+
 
 const SignUpUser = () => {
+    let navigate = useNavigate();
+    const handleSubmit = async (user) => {
+        try {
+            const response = await axios({
+                method: 'post',
+                url: "http://localhost:5000/api/authUser/signup",
+                data: user
+            })
+
+            console.log(response);
+            navigate("/MyUser")
+
+        } catch (err) {
+            console.log(err.response);
+        };
+    }
     return (
         <>
-            <h1> Esta va a ser la pagina del login</h1>
-            <p> Con su button create, header create an account and nuestros centros navbar</p>
+            <FormUser handleSubmit={handleSubmit} />
         </>
-    )
+    );
 }
 
-export default SignUpUser
+export default SignUpUser;

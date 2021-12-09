@@ -1,0 +1,33 @@
+
+.navbar-brand.logo{
+    color:blue;
+}
+
+.navbar{
+    font-family: 'Dancing Script', cursive;
+font-family: 'Indie Flower', cursive;
+font-family: 'Yellowtail', cursive;
+padding: 0px;
+}
+
+.button.navbar-toggler-icon {
+    border: 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    size: 0.5em;
+    border: 1px solid blue;
+}
+
+.navbar-toggler{
+    font-size: 1rem;
+}
+
+.marginRight{
+    margin-right: 20px;
+}
+
+.navbar-toggler:focus, .navbar-toggler:active {
+    outline: none;
+    box-shadow: none;
+}
+

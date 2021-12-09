@@ -11,6 +11,8 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 AuthRouterGym.post("/signup", upload.single("logo"), async (req, res, next) => {
     try {
+
+        console.log(req.body);
         const result = await cloudinary.uploader.upload(req.file.path);
         // const { nombreCentro, password, direccion, entrenadores, cuotas, clases } = req.body;
         const { nombreCentro, password, direccion, logo, cloudinary_id, entrenadores, cuotas, clases } = req.body;
@@ -53,6 +55,7 @@ AuthRouterGym.post("/signup", upload.single("logo"), async (req, res, next) => {
             cuotas,
             clases,
         })
+
 
         const newGym = await gym.save();
 

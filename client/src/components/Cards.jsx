@@ -1,20 +1,18 @@
 import Button from 'react-bootstrap/Button';
-import { Card, CardBody, CardTitle, CardImg } from 'reactstrap';
+import { Link } from 'react-router-dom';
+import Card from 'react-bootstrap/Card'
 
 const Cards = ({ gimnasio }) => {
+
     return (
-
-        <Card>
-            <CardImg src={gimnasio.logo} alt="Logo del Gimnasio" />
-            <CardBody>
-                <CardTitle>{gimnasio.nombreCentro}</CardTitle>
-                <Button variant="primary">Mas información</Button>
-            </CardBody>
+        <Card style={{ width: '18rem' }}>
+            <Card.Img variant="top" src={gimnasio.logo} alt="Logo del Gimnasio" />
+            <Card.Body>
+                <Card.Title>{gimnasio.nombreCentro}</Card.Title>
+                <Link to={`${gimnasio._id}`}>
+                    <Button variant="primary">Mas información</Button></Link>
+            </Card.Body>
         </Card>
-
-
-
-
     )
 }
 

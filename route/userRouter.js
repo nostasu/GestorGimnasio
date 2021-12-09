@@ -351,4 +351,53 @@ userRouter.get("/misReservas", async (req, res, next) => {
     }
 });
 
+//Mostrar todas las clases de mi gimnasio
+userRouter.get("/clasesGym", async (req, res, next) => {
+    try {
+        const { id } = req.user;  //La del usuario
+
+        let user = await User.findById(id).select("gimnasio").populate("gimnasio");
+        if (!user) {
+            return next({
+                sucess: false,
+                message: `There isn't any user with the id: ${id}`
+            })
+        }
+
+        return res.status(201).json({
+            success: true,
+            user
+        })
+
+    } catch (err) {
+        return next({
+            status: 403,
+            message: err
+        });
+    }
+})
+
+//find my gym connected
+userRouter.get("/myUser", async (req, res, next) => {
+    try {
+        const { id } = req.user;
+        const user = await User.findById(id);
+        if (!user) {
+            return next({
+                sucess: false,
+                message: `There isn't any user with this id: ${id}`
+            })
+        }
+        return res.status(201).json({
+            success: true,
+            user
+        })
+    } catch (err) {
+        return next({
+            status: 403,
+            message: err
+        });
+    }
+})
+
 module.exports = userRouter;
