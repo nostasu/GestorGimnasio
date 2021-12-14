@@ -46,7 +46,7 @@ const ShowGyms = (props) => {
     const showNameGyms = () => {
         return (
             <Form.Group as={Col} controlId="formGridState">
-                <Form.Label>Gimnasio</Form.Label>
+                <Form.Label className="mb-0">Gimnasio</Form.Label>
                 <Form.Select onChange={(e) => handleChange(e)}>
                     <option>Escoge gimnasio!</option>
 

@@ -23,7 +23,7 @@ userRouter.route("/")
         } catch (err) {
             return next({
                 status: 403,
-                message: err
+                message: err.message
             });
         }
     })
@@ -47,22 +47,30 @@ userRouter.route("/")
             if (telefono) {
                 usuario.telefono = telefono;
             }
+
             if (email) {
-                return next({
-                    success: false,
-                    message: "Your email is your nick and you can't modify it!"
-                });
-            }
-            if (contraseña) {
-                var regularExpression = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/;
-                if (!regularExpression.test(contraseña)) {
+                const foundEmail = await User.findOne({ email });
+                if (foundEmail && (foundEmail.email != email)) {
                     return next({
-                        success: false,
-                        message: "The password have to contain 6 characters, uppercase, lowercase and a number!"
-                    });
-                } else {
-                    usuario.contraseña = contraseña;
+                        sucess: false,
+                        message: "Already exists this email!"
+                    })
                 }
+
+                usuario.email = email;
+            }
+
+            if (contraseña) {
+                if (!contraseña.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{6,1024}$/)) { //special/number/capital/6 characters))
+                    return next({
+                        sucess: false,
+                        message: 'The password must contain 6 dígits, uppercase, lowercase and special characters'
+                    })
+                }
+
+                const hash = await bcrypt.hash(password, 10);
+
+                usuario.password = hash;
             }
 
             if (fechaInicio) {
@@ -97,13 +105,14 @@ userRouter.route("/")
             const userUpdate = await usuario.save();
             return res.status(201).json({
                 sucess: true,
+                message: "User updated succesfully",
                 userUpdate
             });
 
         } catch (err) {
             return next({
                 status: 403,
-                message: err
+                message: err.message
             });
         }
     })
@@ -122,22 +131,21 @@ userRouter.route("/")
             }
 
             usuario.reservas.forEach(async claseReservada => {
-                let clase = await Class.findById(claseReservada);
-                console.log(clase);
+                let clase = await Class.findById(claseReservada.clase);
                 clase.alumnosInscritos.remove(id);
+                console.log(clase.alumnosInscritos);
                 await clase.save();
             })
 
             return res.status(201).json({
                 sucess: true,
                 message: "User has been removed successfully",
-                usuario
             });
 
         } catch (err) {
             return next({
                 status: 403,
-                message: err
+                message: err.message
             });
         }
     });
@@ -160,12 +168,12 @@ userRouter.get("/find/:id", async (req, res, next) => {
     } catch (err) {
         return next({
             status: 403,
-            message: err
+            message: err.message
         });
     }
 })
 
-userRouter.put("/inscribirse", async (req, res, next) => {
+userRouter.put("/inscribirse/:id", async (req, res, next) => {
     try {
         const { id } = req.user;
 
@@ -177,10 +185,9 @@ userRouter.put("/inscribirse", async (req, res, next) => {
                 message: "You have to login as a user!"
             })
         }
-        const { reservas } = req.body;
+        let reservas = req.params.id;
 
         let existeClaseGym = await Gym.find({ clases: reservas });
-        console.log(existeClaseGym);
 
         if (!existeClaseGym) {
             return next({
@@ -188,6 +195,7 @@ userRouter.put("/inscribirse", async (req, res, next) => {
                 message: "There isn't such class in your gym!"
             })
         }
+        console.log(`id de la clase a reservar: ${reservas}`);
         const clases = await Class.findById(reservas);
         if (!clases) {
             return next({
@@ -213,10 +221,12 @@ userRouter.put("/inscribirse", async (req, res, next) => {
         let reservasMes = 0;
         //Calcular las reservas que tiene el usuario ESE MES de ESE AÑO
         usuario.reservas.forEach(clase => {
+
             let añoReserva = fechaActual.getFullYear();
             let mesReserva = clase.fechaClase.getMonth() + 1;
             let dayReserva = clase.fechaClase.getDay();
-            if (clase.clase === reservas && año === añoReserva && dayClase === dayReserva) {
+
+            if ((clase.clase == reservas) && (año === añoReserva) && (dayClase === dayReserva)) {
                 return next({
                     succes: false,
                     message: "You have already signed up in that class!"
@@ -228,8 +238,6 @@ userRouter.put("/inscribirse", async (req, res, next) => {
         });
 
         let cuotaUser = await Fees.findById(usuario.cuota);
-
-        console.log(`mes : ${mesClase} año ${yearClase}`);
 
         if (reservasMes >= cuotaUser.clases && mes == mesClase && año == yearClase) {
             return next({
@@ -250,23 +258,22 @@ userRouter.put("/inscribirse", async (req, res, next) => {
 
         return res.status(201).json({
             sucess: true,
-            userUpdate
+            message: "Enjoy your trainning!"
         })
 
     } catch (err) {
         return next({
             status: 403,
-            message: err
+            message: err.message
         });
     }
 });
 
-userRouter.put("/delete/clase/", async (req, res, next) => {
+userRouter.put("/delete/clase/:id", async (req, res, next) => {
     try {
 
         const { id } = req.user;
-
-        const { reservas } = req.body;
+        const claseId = req.params.id;
 
         const usuario = await User.findById(id);
         if (!usuario) {
@@ -276,7 +283,8 @@ userRouter.put("/delete/clase/", async (req, res, next) => {
             })
         }
 
-        const clase = await Class.findById(reservas);
+        console.log(`id de la clase: ${claseId}`);
+        const clase = await Class.findById(claseId);
         if (!clase) {
             return next({
                 succes: false,
@@ -284,11 +292,10 @@ userRouter.put("/delete/clase/", async (req, res, next) => {
             })
         }
 
-        console.log(usuario.reservas);
         //Coger mes y año de la "reservas"
 
         let indice = usuario.reservas.findIndex(reserva => {
-            return reserva.clase.equals(reservas) &&
+            return reserva.clase.equals(claseId) &&
                 clase.fechaHora.getTime() == reserva.fechaClase.getTime()
         });
         if (indice < 0) {
@@ -306,13 +313,13 @@ userRouter.put("/delete/clase/", async (req, res, next) => {
 
         return res.status(201).json({
             sucess: true,
-            message: "Your class has been deleted!"
+            message: "Your training has been deleted! Enjoy another one!"
         });
 
     } catch (err) {
         return next({
             status: 403,
-            message: err
+            message: err.message
         });
     }
 });
@@ -323,7 +330,7 @@ userRouter.get("/misReservas", async (req, res, next) => {
 
         const { id } = req.user;
 
-        const usuario = await User.findById(id).select("-password").sort();
+        const usuario = await User.findById(id).select("reservas");
         if (!usuario) {
             return next({
                 succes: false,
@@ -346,7 +353,7 @@ userRouter.get("/misReservas", async (req, res, next) => {
     } catch (err) {
         return next({
             status: 403,
-            message: err
+            message: err.message
         });
     }
 });
@@ -372,12 +379,12 @@ userRouter.get("/clasesGym", async (req, res, next) => {
     } catch (err) {
         return next({
             status: 403,
-            message: err
+            message: err.message
         });
     }
 })
 
-//find my gym connected
+//find user connected
 userRouter.get("/myUser", async (req, res, next) => {
     try {
         const { id } = req.user;
@@ -395,7 +402,7 @@ userRouter.get("/myUser", async (req, res, next) => {
     } catch (err) {
         return next({
             status: 403,
-            message: err
+            message: err.message
         });
     }
 })

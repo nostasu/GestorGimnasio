@@ -1,9 +1,11 @@
 import React, { useState, useRef } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import Error from '../components/Error';
+import Chip from '@mui/material/Chip';
 
+const FormGym = (props) => {
 
-const FormGym = ({ handleSubmit }) => {
     const [newGym, setGym] = useState({
         nombreCentro: "",
         password: "",
@@ -21,18 +23,16 @@ const FormGym = ({ handleSubmit }) => {
 
     const _handleSubmit = (e) => {
         e.preventDefault();
-
-        handleSubmit({ ...newGym, logo: inputFileRef.current.files[0] })
+        if (props.handleSubmit) { props.handleSubmit({ ...newGym, logo: inputFileRef.current.files[0] }) }
+        if (props.handleUpdate) { props.handleUpdate({ ...newGym, logo: inputFileRef.current.files[0] }) }
     }
 
     const handleChange = (e) => {
-        console.log(e);
-        //e tiene la informacion del input que desencadena el change
+
         setGym({
             ...newGym, //destructuracion formValues
             [e.target.name]: e.target.value,
         })
-        console.log(newGym);
     }
 
     const changeEntrenadores = (e) => {
@@ -43,71 +43,94 @@ const FormGym = ({ handleSubmit }) => {
     }
 
     const añadirEntrenador = () => {
-        console.log(entrenador);
+        if (entrenador !== "") {
+            setGym({
+                ...newGym,
+                entrenadores: [...newGym.entrenadores, entrenador]
+            });
+        }
+    }
+
+    const handleDelete = (e, i) => {
+        e.preventDefault();
+        console.log(i);
+        let newArray = [...newGym.entrenadores];
+        console.log("entrenadores", newArray);
+        newArray.splice(i, 1);
+
         setGym({
             ...newGym,
-            entrenadores: [...newGym.entrenadores, entrenador]
+            entrenadores: newArray
         });
-
-        setEntrenador("");
 
         console.log(newGym);
     }
 
-
     return (
-        <div>
+        <div className="container">
             <Form onSubmit={_handleSubmit}>
+                <div className="row">
+                    <Form.Group className="mt-3 col-lg-4" value={newGym.nombreCentro} onChange={(e) => handleChange(e)}>
+                        <Form.Label className="mb-0">Nombre Centro</Form.Label>
+                        <Form.Control type="string" name="nombreCentro" placeholder="nombreCentro" />
+                    </Form.Group>
 
-                <Form.Group className="mb-3" value={newGym.nombreCentro} onChange={(e) => handleChange(e)}>
-                    <Form.Label>Nombre Centro</Form.Label>
-                    <Form.Control type="string" name="nombreCentro" placeholder="nombreCentro" />
-                </Form.Group>
+                    <Form.Group className="mt-3 col-lg-8" controlId="formBasicPassword" value={newGym.password} onChange={(e) => handleChange(e)}>
+                        <Form.Label className="mb-0"> Password </Form.Label>
+                        <Form.Control type="password" name="password" placeholder="password" />
+                    </Form.Group>
+                </div>
+                <div className="row mt-3">
 
-                <Form.Group className="mb-3" value={newGym.password} onChange={(e) => handleChange(e)}>
-                    <Form.Label> Password </Form.Label>
-                    <Form.Control type="string" name="password" placeholder="password" />
-                    <Form.Text className="text-muted">
-                        We'll never share your password with anyone else.
-                    </Form.Text>
-                </Form.Group>
+                    <Form.Group className="mb-3 col-lg-8" value={newGym.direccion} onChange={(e) => handleChange(e)}>
+                        <Form.Label className="mb-0"> Dirección </Form.Label>
+                        <Form.Control type="string" name="direccion" placeholder="direccion" />
+                    </Form.Group>
 
-                <Form.Group className="mb-3" value={newGym.direccion} onChange={(e) => handleChange(e)}>
-                    <Form.Label> Dirección </Form.Label>
-                    <Form.Control type="string" name="direccion" placeholder="direccion" />
-                </Form.Group>
-
-                <Form.Group controlId="formFile" className="mb-3" value={newGym.logo} onChange={(e) => handleChange(e)}>
-                    <Form.Label> Introduce el logo de tu centro </Form.Label>
-                    <Form.Control type="file" name="logo" ref={inputFileRef} />
-                </Form.Group>
-
-                {/* value entrenador */}
-                <div className="entrenadores">
-                    <Form.Group className="mb-2" value={newGym.entrenadores} onChange={changeEntrenadores}>
-                        <Form.Label>Nombre Entrenador</Form.Label>
+                    <Form.Group controlId="formFile" className="mb-3 col-lg-4" value={newGym.logo} onChange={(e) => handleChange(e)}>
+                        <Form.Label className="mb-0"> Introduce el logo de tu centro </Form.Label>
+                        <Form.Control type="file" name="logo" ref={inputFileRef} />
+                    </Form.Group>
+                </div>
+                <div className="row entrenadores align-items-center justify-content-sm-center">
+                    {/* value entrenador */}
+                    <Form.Group className="mb-2 col-lg-8" value={newGym.entrenadores} onChange={changeEntrenadores}>
+                        <Form.Label className="mb-0">Nombre Entrenador</Form.Label>
                         <Form.Control type="string" name="nombreApellidos" placeholder="NombreApellidos" />
                     </Form.Group>
 
-                    <Form.Group className="mb-2" value={newGym.entrenadores} onChange={changeEntrenadores}>
-                        <Form.Label>Edad Entrenador</Form.Label>
+                    <Form.Group className="mb-2 col-lg-4" value={newGym.entrenadores} onChange={changeEntrenadores}>
+                        <Form.Label className="mb-0">Edad Entrenador</Form.Label>
                         <Form.Control type="string" name="edad" placeholder="Edad" />
                     </Form.Group>
+                    <div>
+                        <Button type="button" variant="primary" size="sm" className="btn mt-3 col-lg-2 col-sm-2" onClick={añadirEntrenador}>Añadir Entrenador</Button>
+                    </div>
+                </div>
 
-                    <button type="button" className="btn btn-light" onClick={añadirEntrenador}>Añadir Entrenador</button>
+                <div className="row mt-3 align-items-center">
 
-                    {newGym.entrenadores.map(entrenador => {
+                    {newGym.entrenadores.map((entrenador, i) => {
                         return (
-                            `Añadido: ${entrenador.nombreApellidos}, ${entrenador.edad}`
+                            <div key={i} className="col-sm-3 col-xs-2 mt-3">
+                                <Chip
+                                    label={entrenador.nombreApellidos}
+                                    variant="outlined"
+                                    color="primary"
+                                    onDelete={(e) => handleDelete(e, i)}
+                                />
+                            </div>
                         )
                     })
                     }
-                    <Button variant="primary" type="submit"> Create! </Button>
+
                 </div>
 
-            </Form>
+                <Button variant="primary" className="mt-3 mb-2" type="submit"> Submit! </Button>
+            </Form >
 
-        </div>
+            {props.error && <Error error={props.error} />}
+        </div >
 
     )
 }

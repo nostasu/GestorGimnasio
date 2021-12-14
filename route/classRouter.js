@@ -198,7 +198,7 @@ classRouter.put("/update/:id", checkToken, async (req, res, next) => {
 //Delete a class and all dependencies
 classRouter.delete("/delete/:id", checkToken, async (req, res, next) => {
     try {
-
+        console.log("entra!");
         const idGym = req.user.id;
         const { id } = req.params;
 

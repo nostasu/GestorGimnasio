@@ -18,25 +18,20 @@ const FormClass = ({ handleSubmit }) => {
     }
 
     const handleChange = (e) => {
-        console.log(e);
         setClase({
             ...clase, //destructuracion formValues
             [e.target.name]: e.target.value,
         })
-        console.log(clase);
     }
 
     const handleChangeClase = (e) => {
-        console.log(e);
         setClase({
             ...clase,
             tipoClase: e.target.value,
         })
-        console.log(clase);
     }
 
     const handleChangeHour = (e) => {
-        console.log(e._d);
         setClase({
             ...clase,
             fechaHora: e._d,
@@ -44,35 +39,35 @@ const FormClass = ({ handleSubmit }) => {
     }
 
     return (
-        <div>
+        <div className="container justify-content-center align-items-center">
             <Form onSubmit={_handleSubmit}>
+                <div className="row mt-3">
+                    <Form.Group className="mb-3" value={clase.tipoClase}>
+                        <Form.Label className="mb-0">Tipo Clase</Form.Label>
+                        <Form.Select onChange={(e) => handleChangeClase(e)}>
+                            <option>Escoge el tipo de clase!</option>
+                            <option name="tipoClase" value="Tacfit">Tacfit</option>
+                            <option name="tipoClase" value="Clase en Grupo">Clase en Grupo</option>
+                            <option name="tipoClase" value="Entrenamiento Personal">Entrenamiento Personal</option>
+                        </Form.Select>
+                    </Form.Group>
 
-                <Form.Group className="mb-3" value={clase.tipoClase}>
-                    <Form.Label>Tipo Clase</Form.Label>
-                    <Form.Select onChange={(e) => handleChangeClase(e)}>
-                        <option>Escoge el tipo de clase!</option>
-                        <option name="tipoClase" value="Tacfit">Tacfit</option>
-                        <option name="tipoClase" value="Clase en Grupo">Clase en Grupo</option>
-                        <option name="tipoClase" value="Entrenamiento Personal">Entrenamiento Personal</option>
-                    </Form.Select>
-                </Form.Group>
+                    <Form.Group className="mb-3 ">
+                        <Form.Label className="mb-0"> FechaHora </Form.Label>
+                        <Datetime
+                            value={clase.fechaHora}
+                            onChange={(e) => handleChangeHour(e)}
+                            timeFormat={true}
+                            name="fechaHora"
+                            inputProps={{ placeholder: "Start Date" }}
+                        />
+                    </Form.Group>
 
-                <Form.Group className="mb-3">
-                    <Form.Label> FechaHora </Form.Label>
-                    <Datetime
-                        value={clase.fechaHora}
-                        onChange={(e) => handleChangeHour(e)}
-                        timeFormat={true}
-                        name="fechaHora"
-                        inputProps={{ placeholder: "Start Date" }}
-                    />
-                </Form.Group>
-
-                <Form.Group className="mb-3" value={clase.maxAlumnos} onChange={(e) => handleChange(e)}>
-                    <Form.Label> Maximo Numero Alumnos </Form.Label>
-                    <Form.Control type="number" name="maxAlumnos" placeholder="Numero alumnos" />
-                </Form.Group>
-
+                    <Form.Group className="mb-3 col-md-4" value={clase.maxAlumnos} onChange={(e) => handleChange(e)}>
+                        <Form.Label className="mb-0"> Maximo Numero Alumnos </Form.Label>
+                        <Form.Control type="number" name="maxAlumnos" placeholder="Numero alumnos" />
+                    </Form.Group>
+                </div>
                 <Button variant="primary" type="submit"> Create! </Button>
 
             </Form>

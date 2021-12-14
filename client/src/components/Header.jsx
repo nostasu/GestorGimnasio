@@ -1,27 +1,34 @@
-import { Link } from "react-router-dom";
+
 import "./stylesComponents/header.css"
+import React, { useState } from 'react';
+import Navbar from 'react-bootstrap/Navbar'
+import { Container, Nav } from "react-bootstrap";
+import { Link } from "react-router-dom";
+
+
 
 const Header = () => {
+    const [expanded, setExpanded] = useState(false);
     return (
-        <nav className="navbar navbar-expand-lg navbar-light bg-light">
-            <div className="container-fluid d-flex">
-                <a className="navbar-brand logo" href="#">Gestor Reservas</a>
-                <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
-                    <span className="navbar-toggler-icon"></span>
-                </button>
-                <div className="collapse navbar-collapse r-12" id="navbarTogglerDemo02">
-                    <ul className="navbar-nav ">
-                        <li className="marginRight">
-                            <Link to="/">Home</Link>
-                        </li>
-                        <li>
-                            <Link to="/NuestrosCentros">Nuestros centros</Link>
-                        </li>
+        <Navbar expanded={expanded} bg="light" expand="md">
+            <Container fluid>
+                <Navbar.Brand href="http://localhost:3000">Gestor Reservas</Navbar.Brand>
+                <Navbar.Toggle aria-controls="navbarScroll" onClick={() => setExpanded(expanded ? false : "expanded")} />
+                <Navbar.Collapse id="navbarScroll">
+                    <Nav
+                        className="my-lg-0"
+                        style={{ maxHeight: '100px' }}
+                        navbarScroll
+                    >
+                        <Link to="/" onClick={() => setExpanded(false)} className="nav-link">Home</Link>
+                        <Link to="/NuestrosCentros" onClick={() => setExpanded(false)} className="nav-link"> Nuestros Centros</Link>
 
-                    </ul>
-                </div>
-            </div>
-        </nav>
+                    </Nav>
+                </Navbar.Collapse>
+            </Container>
+        </Navbar>
+
+
     )
 }
 

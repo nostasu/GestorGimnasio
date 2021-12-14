@@ -3,8 +3,9 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import ShowGyms from "./ShowGyms";
 import ShowAllFess from "../components/ShowAllFees"
+import Error from '../components/Error';
 
-const FormUser = ({ handleSubmit }) => {
+const FormUser = (props) => {
 
     const [user, setUser] = useState({
         nombre: "",
@@ -18,67 +19,72 @@ const FormUser = ({ handleSubmit }) => {
     })
     const [fee, setFee] = useState();
     const [gym, setGym] = useState();
+    // const [error, setError] = useState();
 
     const _handleSubmit = (e) => {
         e.preventDefault();
-        console.log(fee);
-        console.log(gym);
-        handleSubmit({ ...user, cuota: fee, gimnasio: gym })
+        if (props.handleSubmit) {
+            props.handleSubmit({ ...user, cuota: fee, gimnasio: gym })
+        }
+        if (props.handleUpdate) {
+            props.handleUpdate({ ...user, cuota: fee, gimnasio: gym })
+        }
     }
 
+
     const handleChange = (e) => {
-        console.log(e.target);
-        //e tiene la informacion del input que desencadena el change
         setUser({
             ...user, //destructuracion formValues
             [e.target.name]: e.target.value
         })
-        console.log(user);
     }
 
     return (
-        <Form onSubmit={_handleSubmit}>
+        <div className="container">
+            <Form onSubmit={_handleSubmit}>
+                <div className="row">
+                    <Form.Group className=" mt-3 col-md-4" value={user.nombre} onChange={(e) => handleChange(e)}>
+                        <Form.Label className="mb-0">Nombre</Form.Label>
+                        <Form.Control type="string" name="nombre" placeholder="Nombre" />
+                    </Form.Group>
 
-            <Form.Group className="mb-3 mt-3" value={user.nombre} onChange={(e) => handleChange(e)}>
-                <Form.Label>Nombre</Form.Label>
-                <Form.Control type="string" name="nombre" placeholder="Nombre" />
-            </Form.Group>
+                    <Form.Group className=" mt-3 col-md-8" value={user.apellidos} onChange={(e) => handleChange(e)}>
+                        <Form.Label className="mb-0">Apellidos</Form.Label>
+                        <Form.Control type="string" name="apellidos" placeholder="Apellidos" />
+                    </Form.Group>
+                </div>
+                <div className="row mt-3">
+                    <Form.Group className="mb-3 col-md-3" value={user.telefono} onChange={handleChange}>
+                        <Form.Label className="mb-0"> Telefono </Form.Label>
+                        <Form.Control type="string" name="telefono" placeholder="telefono" />
+                    </Form.Group>
 
-            <Form.Group className="mb-3 mt-3" value={user.apellidos} onChange={(e) => handleChange(e)}>
-                <Form.Label>Apellidos</Form.Label>
-                <Form.Control type="string" name="apellidos" placeholder="Apellidos" />
-            </Form.Group>
+                    <Form.Group className="mb-3 col-md-6" value={user.email} onChange={handleChange}>
+                        <Form.Label className="mb-0"> Email </Form.Label>
+                        <Form.Control type="email" name="email" placeholder="email" />
+                    </Form.Group>
 
-            <Form.Group className="mb-3" value={user.telefono} onChange={handleChange}>
-                <Form.Label> Telefono </Form.Label>
-                <Form.Control type="string" name="telefono" placeholder="telefono" />
-            </Form.Group>
+                    <Form.Group className="mb-3 col-md-3" value={user.password} onChange={handleChange}>
+                        <Form.Label className="mb-0"> Password </Form.Label>
+                        <Form.Control type="password" name="password" placeholder="password" />
+                    </Form.Group>
+                </div>
 
-            <Form.Group className="mb-3" value={user.email} onChange={handleChange}>
-                <Form.Label> Email </Form.Label>
-                <Form.Control type="email" name="email" placeholder="email" />
-            </Form.Group>
+                <div className="row">
+                    <ShowGyms comesFrom={"showGym"} gym={gym} setGym={setGym} onChange={handleChange} />
 
-            <Form.Group className="mb-3" value={user.password} onChange={handleChange}>
-                <Form.Label> Password </Form.Label>
-                <Form.Control type="password" name="password" placeholder="password" />
-                <Form.Text className="text-muted">
-                    We'll never share your password with anyone else.
-                </Form.Text>
-            </Form.Group>
+                    {gym && <ShowAllFess comesFrom={"users"} fee={fee} setFee={setFee} gym={gym} onChange={handleChange} />}
 
-            <ShowGyms comesFrom={"showGym"} gym={gym} setGym={setGym} onChange={handleChange} />
+                    <Form.Group className="mb-3 mt-3 col-md-3" value={user.fechaInicio} onChange={handleChange}>
+                        <Form.Label className="mb-0"> Fecha Inicio Gym </Form.Label>
+                        <Form.Control type="date" name="fechaInicio" placeholder="Fecha Inicio" />
+                    </Form.Group>
+                </div>
+                <Button variant="primary" className="mb-2" type="submit"> Create! </Button>
+            </Form>
 
-            <ShowAllFess fee={fee} setFee={setFee} onChange={handleChange} />
-
-
-            <Form.Group className="mb-3" value={user.fechaInicio} onChange={handleChange}>
-                <Form.Label> Fecha Inicio Gym </Form.Label>
-                <Form.Control type="date" name="fechaInicio" placeholder="Fecha Inicio" />
-            </Form.Group>
-
-            <Button variant="primary" type="submit"> Create! </Button>
-        </Form>
+            {props.error && <Error error={props.error} />}
+        </div>
 
 
     )

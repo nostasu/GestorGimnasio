@@ -2,16 +2,51 @@
 * {
   margin: 0px;
   padding: 0px;
-  background-color: #fffffff5;
   align-items: center;
   text-align: center;
-  color: rgb(10, 10, 10);
+  font-family: 'Gluten', cursive;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500&family=Indie+Flower&family=Yellowtail&display=swap');
 
-.container{
-  margin: 5px;
-  margin-top: 10px;
-  height: 95vh;
+.containerPpal{
+  background-color: #fdfbfb;
+  width: 95%;
+  height: 92vh;
+  margin:auto;
+}
+
+.containerPpal.myUser, .containerPpal.myGym{
+  background-color: #fdfbfb;
+  padding-top: 15px;
+
+}
+
+img.fotoAvatar{
+  width: 40%;
+  max-width: 300px;
+  height: auto;
+}
+
+.presentacionCentro{
+  width: 80%;
+  margin: auto;
+
+}
+
+.homePpal .figure-caption{
+  font-size: 1em;
+  color:black;
+}
+
+.homePpal .btn-primary {
+  background-color: #0d83fde3;
+}
+
+a.nav-link{
+  font-size: 1.25em;
+}
+
+a:link, a:visited, a:active, a:hover {
+  text-decoration:none;
+  color: rgb(5, 5, 5);
 }

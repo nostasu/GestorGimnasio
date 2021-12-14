@@ -3,7 +3,9 @@ const Gym = require("../models/Gym"); //requerimos el export
 const Users = require("../models/User");
 const Class = require("../models/Class");
 const { checkToken } = require("../middleware");
+const bcrypt = require("bcrypt");
 const cloudinary = require('../cloudinary/cloudinary');
+const upload = require('../cloudinary/multer');
 const gymRouter = express.Router();
 
 gymRouter
@@ -49,18 +51,53 @@ gymRouter
         }
     })
     //Updating the gym
-    .put(checkToken, async (req, res, next) => {
+    .put(upload.single("logo"), checkToken, async (req, res, next) => {
+
         try {
             const { id } = req.user  //La id del gimnasio
 
-            const { direccion, entrenadores } = req.body;
+            const { nombreCentro, password, direccion, logo, cloudinary_id, entrenadores, cuotas, clases } = req.body;
+
 
             let gym = await Gym.findById(id);
+
             if (!gym) {
                 return next({
                     sucess: false,
                     message: "There isn't any gym with this id"
                 })
+            }
+
+            if (nombreCentro) {
+                const foundGymName = await Gym.findOne({ nombreCentro });
+                if (foundGymName && (foundGymName.nombreCentro != nombreCentro)) {
+                    return next({
+                        sucess: false,
+                        message: "Already exists a gym with this name!"
+                    })
+                }
+
+                gym.nombreCentro = nombreCentro;
+            }
+
+            if (password) {
+                if (!password.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{6,1024}$/)) { //special/number/capital/6 characters))
+                    return next({
+                        sucess: false,
+                        message: 'The password must contain 6 dígits, uppercase, lowercase and special characters'
+                    })
+                }
+
+                const hash = await bcrypt.hash(password, 10);
+
+                gym.password = hash;
+            }
+
+            if (req.file) {
+                const result = await cloudinary.uploader.upload(req.file.path);
+                await cloudinary.uploader.destroy(gym.cloudinary_id);
+                gym.logo = result.secure_url;
+                gym.cloudinary_id = result.public_id;
             }
 
             if (direccion) {
@@ -71,15 +108,17 @@ gymRouter
             }
 
             const gymUpdate = await gym.save();
+
             return res.status(201).json({
                 sucess: true,
+                message: "Gym updated succesfully",
                 gymUpdate
             })
 
         } catch (err) {
             return next({
                 status: 403,
-                message: err
+                message: err.message
             });
         }
     })
@@ -126,7 +165,7 @@ gymRouter
         } catch (err) {
             return next({
                 status: 403,
-                message: err
+                message: err.message
             });
         }
     });
@@ -150,7 +189,7 @@ gymRouter.get("/find/:id", async (req, res, next) => {
     } catch (err) {
         return next({
             status: 403,
-            message: err
+            message: err.message
         });
     }
 })
@@ -247,7 +286,7 @@ gymRouter.get("/clasesGym", checkToken, async (req, res, next) => {
         });
     }
 })
-//Show all the classes
+
 
 //find my gym connected
 gymRouter.get("/myGym", checkToken, async (req, res, next) => {

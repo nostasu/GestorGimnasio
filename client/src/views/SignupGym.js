@@ -1,13 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import axios from "axios"
 import { useNavigate } from 'react-router-dom';
 import FormGym from "../components/FormGym";
 
-
 const SignUpGym = () => {
 
     let navigate = useNavigate();
-
+    const [error, setError] = useState(null);
     const handleSubmit = async (gimnasio) => {
         try {
 
@@ -17,7 +16,6 @@ const SignUpGym = () => {
             formData.append("password", gimnasio.password);
             formData.append("direccion", gimnasio.direccion);
             formData.append("logo", gimnasio.logo);
-            console.log(gimnasio.entrenadores);
             gimnasio.entrenadores.forEach((item, i) => {
                 formData.append(`entrenadores[${i}][nombreApellidos]`, item.nombreApellidos);
                 formData.append(`entrenadores[${i}][edad]`, item.edad);
@@ -35,12 +33,13 @@ const SignUpGym = () => {
 
         } catch (err) {
             console.log(err.response);
+            setError(err.response.data);
         }
     }
 
     return (
         <>
-            <FormGym handleSubmit={handleSubmit} />
+            <FormGym handleSubmit={handleSubmit} error={error} />
         </>
     );
 }

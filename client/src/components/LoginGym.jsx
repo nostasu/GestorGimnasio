@@ -43,24 +43,28 @@ const LoginGym = () => {
   }
   return (
     <>
-      <Form onSubmit={_handleSubmit}>
-        <FormGroup className="mb-3" controlId="formBasic">
-          <FormLabel>Nombre Centro</FormLabel>
-          <FormControl type="string" placeholder="Nombre del centro" name="nombreCentro" onChange={e => handleChange(e)} />
-        </FormGroup>
+      <div className="container mt-3">
+        <Form onSubmit={_handleSubmit} >
+          <FormGroup className="mb-3" controlId="formBasic">
+            <FormLabel className="mb-0">Nombre Centro</FormLabel>
+            <FormControl type="string" placeholder="Nombre del centro" name="nombreCentro" onChange={e => handleChange(e)} />
+          </FormGroup>
 
-        <FormGroup className="mb-3" controlId="formBasicPassword">
-          <FormLabel>Password</FormLabel>
-          <FormControl type="password" placeholder="Password" name="password" onChange={e => handleChange(e)} />
-          <FormText className="text-muted">
-            We'll never share your email with anyone else.
-          </FormText>
-        </FormGroup>
+          <FormGroup className="mb-3" controlId="formBasicPassword">
+            <FormLabel className="mb-0">Password</FormLabel>
+            <FormControl type="password" placeholder="Password" name="password" onChange={e => handleChange(e)} />
+            <FormText className="text-muted">
+              We'll never share your email with anyone else.
+            </FormText>
+          </FormGroup>
 
-        <Button variant="primary" type="submit">
-          Submit
-        </Button>
-      </Form>
+          <Button variant="primary" type="submit">
+            Submit
+          </Button>
+        </Form>
+
+      </div >
+
       <div >
         {error && <Error error={error} />}
       </div>

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import NavbarPpal from '../components/NavbarPpal';
+
 
 const MyGym = () => {
 
@@ -30,26 +32,28 @@ const MyGym = () => {
 
     const pintarPantalla = () => {
         return (
-            <div>
-                <p> Probando redirigir gym</p>
-                <p> Aqui tenemos que tener, header ( por defecto) , pagina, footer</p>
-                <div className="container containerUp">
-                    <p> Logo (que lo tengo) </p>
-                    <p> Nombre</p>
-                    <p> Email </p>
-                    <p> Emoticono Borrar </p>
-                    <p> Emoticono Boli</p>
-
+            <div className="containerPpal myUser">
+                <div className="d-flex justify-content-around">
+                    <img src={gym.logo} width="200" alt="logo del gimnasio" />
+                    <div className="d-flex flex-column align-items-start">
+                        <Link to="/BorrarUsuario" state={{ from: 'gimnasio' }}><i className="me-3 bi bi-trash"> Borrar</i></Link>
+                        <Link to="/ActualizarGimnasio"><i className="bi bi-pen-fill"> Editar </i></Link>
+                    </div>
                 </div>
-
+                <div className="presentacionCentro mt-3">
+                    <h2> Bienvenido {gym.nombreCentro}!</h2>
+                    <p> Aquí puedes añadir clases, mostrar todas clases, crear tus cuotas y mostrarlas todas</p>
+                </div>
+                <hr />
                 <div className="container">
-                    <p> <Link to="/CrearClase"> Crear Clases!</Link></p>
-                    <p> <Link to={`/TodasClases/${gym._id}`}> Mostrar Clases y Eliminarlas </Link></p>
-                    <p> <Link to="/CrearCuota">Crearr Cuotas!</Link></p>
-                    <p> <Link to="/MostrarTodasCuotas" >Mostrar todas Cuotas </Link> </p>
-
+                    <Link to="/CrearClase"> Crear Clases!</Link><hr />
+                    <Link to={`/TodasClases/${gym._id}/*`} state={{ from: 'gimnasio' }}> Mostrar Clases y Eliminarlas </Link> <hr />
+                    <Link to="/CrearCuota">Crearr Cuotas!</Link><hr />
+                    <Link to={`/MostrarCuotas/${gym._id}`} state={{ from: 'gimnasio' }} > Mostrar Todas Cuotas </Link><hr />
                 </div>
-            </div>
+
+            </div >
+
         )
     }
 
@@ -57,6 +61,7 @@ const MyGym = () => {
     return (
         <>
             {gym ? pintarPantalla() : loading()}
+            <NavbarPpal gym={"gym"} />
         </>
     )
 }

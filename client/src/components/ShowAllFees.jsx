@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Form, Col } from "react-bootstrap";
-import CardFees from "./CardFees";
 
 const ShowAllFees = (props) => {
     const [fees, setFees] = useState([]);
@@ -21,20 +20,39 @@ const ShowAllFees = (props) => {
     }, []);
 
 
-    const handleChange = (e) => {
-        //e tiene la informacion del input que desencadena el change
-        props.setFee(e.target.value);
-        console.log(props.fee);
-    }
+    const [gym, setGym] = useState(null);
 
-    const showFees = () => {
+    useEffect(() => {
+        const getData = async () => {
+            try {
+                let response = await axios({
+                    url: `http://localhost:5000/api/gimnasios/find/${props.gym}`,
+                    headers: {
+                        Authorization: localStorage.getItem("jwt_token")
+                    }
+                });
+                console.log(response.data);
+                setGym(response.data.gym);
+            } catch (err) {
+                console.log(err.response);
+            }
+        }
+        getData()
+    }, [props])
+
+    const cuotasDelGym = () => {
+
+        let arrayFiltrado = fees.filter(cuota => gym.cuotas.includes(cuota._id));
+
+
+        console.log(arrayFiltrado);
         return (
             <Form.Group as={Col} controlId="formGridState">
-                <Form.Label>Cuotas</Form.Label>
+                <Form.Label className="mb-0 mt-3">Cuotas</Form.Label>
                 <Form.Select onChange={(e) => handleChange(e)}>
                     <option>Escoge una Cuota!</option>
 
-                    {fees.map((cuota, i) => {
+                    {arrayFiltrado.map((cuota, i) => {
                         return (
                             <option key={i} name="cuota" value={cuota._id}>{cuota.nombre}</option>
                         );
@@ -42,25 +60,19 @@ const ShowAllFees = (props) => {
                 </Form.Select>
             </Form.Group>
         )
-    }
 
-    const showAll = () => {
-        return (
-            <>
-                {fees.map((cuota, i) => {
-                    return (
-                        < CardFees key={i} cuota={cuota} />
-                    );
-                })}
-            </>
-        )
+
+    }
+    const handleChange = (e) => {
+        //e tiene la informacion del input que desencadena el change
+        props.setFee(e.target.value);
+        console.log(props.fee);
     }
 
     return (
         <div>
-            {console.log(props)}
 
-            {props.comesFrom ? showAll() : showFees()}
+            {gym && cuotasDelGym()}
         </div>
     )
 }

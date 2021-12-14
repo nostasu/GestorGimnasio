@@ -1,12 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 import FormUser from "../components/FormUser";
 
-
-
 const SignUpUser = () => {
     let navigate = useNavigate();
+    const [error, setError] = useState(null);
     const handleSubmit = async (user) => {
         try {
             const response = await axios({
@@ -16,16 +15,17 @@ const SignUpUser = () => {
             })
 
             console.log(response);
-            navigate("/MyUser")
+            navigate("/LoginUser");
 
         } catch (err) {
-            console.log(err.response);
+            console.log(err);
+            setError(err.response.data);
         };
     }
     return (
-        <>
-            <FormUser handleSubmit={handleSubmit} />
-        </>
+        <div>
+            <FormUser handleSubmit={handleSubmit} error={error} />
+        </div>
     );
 }
 

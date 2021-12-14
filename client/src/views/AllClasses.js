@@ -1,16 +1,21 @@
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
-import { useEffect, useState } from "react";
 import axios from "axios";
 import CardClasses from "../components/CardClasses"
 import { useParams } from 'react-router';
+import { useLocation } from 'react-router-dom'
+import { Alert } from 'react-bootstrap';
+
 
 const AllClasses = () => {
+
     const [clases, setClases] = useState([]);
+
     let { id } = useParams();
 
-    //necesito la id del gym. Si viene de usuario, la tendra como usuario.id, si viene de gym---> ._id
+    const location = useLocation()
+    const { from } = location.state;
 
     useEffect(() => {
         const getData = async () => {
@@ -27,19 +32,28 @@ const AllClasses = () => {
         getData();
     }, []);
 
-    //si vengo de usuarios, me va a mostrar las clases y un link que me lleve a esa clase
-    // y me permita apuntarme
-
-
-
     const showClassesGym = () => {
         let arrayGym = clases.filter(clase => clase.gimnasio === id);
+        var sortedArray = arrayGym.sort((a, b) => {
+            return new Date(a.fechaHora).getTime() -
+                new Date(b.fechaHora).getTime()
+        });
+
+        if (sortedArray.length === 0) {
+            return (
+                <Alert variant="danger" className="mt-3">
+                    Todavia no existen clases!</Alert>
+            )
+        }
+
 
         return (
-            <div className="d-flex flex-row justify-content-around">
-                {arrayGym.map((clase) => {
+            <div className="d-flex flex-row flex-wrap justify-content-around">
+                {sortedArray.map((clase) => {
                     return (
-                        <CardClasses key={clase._id} clase={clase} />
+                        <div key={clase._id}>
+                            <CardClasses clase={clase} from={from}> </CardClasses>
+                        </div>
                     );
                 })}
             </div>
@@ -48,8 +62,7 @@ const AllClasses = () => {
 
     return (
         <div>
-            {showClassesGym()}
-
+            {clases && showClassesGym()}
         </div>
     )
 }

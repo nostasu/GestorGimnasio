@@ -3,8 +3,10 @@ import axios from 'axios';
 import FormCuota from '../components/FormCuota'
 import { useNavigate } from 'react-router-dom';
 
+
 const CreateFee = () => {
     let navigate = useNavigate();
+
     const handleSubmit = async (fee) => {
         try {
 

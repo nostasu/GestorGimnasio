@@ -21,9 +21,12 @@ const gymSchema = new Schema({
     entrenadores: [{
         nombreApellidos: {
             type: String,
-            // required: true
+            required: true
         },
-        edad: Number
+        edad: {
+            type: Number,
+            required: true
+        }
     }],
     cuotas: [{
         type: mongoose.Types.ObjectId,
