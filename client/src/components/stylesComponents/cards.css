@@ -7,9 +7,14 @@
 
 .fechaHora.card-body{
     max-width:8rem;
-    align-items:flex-start
+    align-items:flex-start;
 }
 
 .tipoClase{
     width: 11rem;
+}
+
+.cuotasGym {
+    width: 80%;
+    margin: auto;
 }

@@ -3,7 +3,6 @@ import axios from "axios";
 import FormGym from "../components/FormGym";
 import { Alert, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import Error from '../components/Error';
 
 
 const UpdateGym = () => {

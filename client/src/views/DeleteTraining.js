@@ -28,7 +28,7 @@ const DeleteTraining = () => {
             }
         };
         eliminarReserva();
-    }, []);
+    }, [claseId]);
 
 
     return (

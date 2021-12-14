@@ -53,17 +53,13 @@ const FormGym = (props) => {
 
     const handleDelete = (e, i) => {
         e.preventDefault();
-        console.log(i);
         let newArray = [...newGym.entrenadores];
-        console.log("entrenadores", newArray);
         newArray.splice(i, 1);
 
         setGym({
             ...newGym,
             entrenadores: newArray
         });
-
-        console.log(newGym);
     }
 
     return (
@@ -123,7 +119,6 @@ const FormGym = (props) => {
                         )
                     })
                     }
-
                 </div>
 
                 <Button variant="primary" className="mt-3 mb-2" type="submit"> Submit! </Button>
@@ -131,7 +126,6 @@ const FormGym = (props) => {
 
             {props.error && <Error error={props.error} />}
         </div >
-
     )
 }
 

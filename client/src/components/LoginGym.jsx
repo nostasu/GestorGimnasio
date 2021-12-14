@@ -10,7 +10,6 @@ const LoginGym = () => {
   let [gym, setGym] = useState({
     nombreCentro: "",
     password: ""
-
   });
 
   const [error, setError] = useState(null)
@@ -34,13 +33,12 @@ const LoginGym = () => {
       console.log(response.data);
       localStorage.setItem("jwt_token", response.data.token);
       navigate('/MyGym');
-
     } catch (err) {
       console.log(err.response);
       setError(err.response.data);
     }
-
   }
+
   return (
     <>
       <div className="container mt-3">
@@ -62,9 +60,7 @@ const LoginGym = () => {
             Submit
           </Button>
         </Form>
-
       </div >
-
       <div >
         {error && <Error error={error} />}
       </div>

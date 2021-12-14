@@ -36,8 +36,8 @@ const MyGym = () => {
                 <div className="d-flex justify-content-around">
                     <img src={gym.logo} width="200" alt="logo del gimnasio" />
                     <div className="d-flex flex-column align-items-start">
+                        <Link to="/ActualizarGimnasio" className="mb-3"><i className="bi bi-pen-fill"> Editar </i></Link>
                         <Link to="/BorrarUsuario" state={{ from: 'gimnasio' }}><i className="me-3 bi bi-trash"> Borrar</i></Link>
-                        <Link to="/ActualizarGimnasio"><i className="bi bi-pen-fill"> Editar </i></Link>
                     </div>
                 </div>
                 <div className="presentacionCentro mt-3">
@@ -48,7 +48,7 @@ const MyGym = () => {
                 <div className="container">
                     <Link to="/CrearClase"> Crear Clases!</Link><hr />
                     <Link to={`/TodasClases/${gym._id}/*`} state={{ from: 'gimnasio' }}> Mostrar Clases y Eliminarlas </Link> <hr />
-                    <Link to="/CrearCuota">Crearr Cuotas!</Link><hr />
+                    <Link to="/CrearCuota">Crear Cuotas!</Link><hr />
                     <Link to={`/MostrarCuotas/${gym._id}`} state={{ from: 'gimnasio' }} > Mostrar Todas Cuotas </Link><hr />
                 </div>
 

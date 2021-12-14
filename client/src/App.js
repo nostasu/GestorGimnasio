@@ -27,7 +27,6 @@ function App() {
       <div className="containerPpal" >
         <Outlet />
       </div >
-
     </>
   );
 }

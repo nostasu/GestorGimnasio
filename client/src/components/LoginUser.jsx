@@ -4,14 +4,12 @@ import { Form, FormGroup, FormLabel, FormControl, FormText, Button } from 'react
 import { useNavigate } from 'react-router-dom';
 import Error from "./Error";
 
-
 const LoginUser = () => {
 
     let navigate = useNavigate();
     let [user, setUser] = useState({
         email: "",
         password: ""
-
     });
 
     const [error, setError] = useState(null)
@@ -29,7 +27,6 @@ const LoginUser = () => {
     }
 
     const submit = async () => {
-
         try {
             const response = await axios.post("http://localhost:5000/api/authUser/login", user);
             console.log(response.data);
@@ -38,8 +35,8 @@ const LoginUser = () => {
         } catch (err) {
             setError(err.response.data);
         }
-
     }
+
     return (
         <>
             <div className="container mt-3">

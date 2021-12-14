@@ -12,7 +12,6 @@ const DeleteGymClass = () => {
     const [error, setError] = useState();
     let [borrada, setBorrada] = useState();
 
-    console.log(localStorage.getItem("jwt_token"))
     useEffect(() => {
         const eliminarClase = async () => {
             try {
@@ -29,7 +28,7 @@ const DeleteGymClass = () => {
             }
         };
         eliminarClase();
-    }, []);
+    }, [claseId]);
 
 
     return (

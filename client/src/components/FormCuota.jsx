@@ -37,7 +37,6 @@ const FormCuota = ({ handleSubmit }) => {
                         <Form.Control type="string" name="precio" placeholder="precio" />
                     </Form.Group>
 
-
                     <Form.Group className="mb-3" value={fee.clases} onChange={(e) => handleChange(e)}>
                         <Form.Label className="mb-0">Numero Clases</Form.Label>
                         <Form.Control type="string" name="clases" placeholder="Numero clases" />
@@ -45,10 +44,8 @@ const FormCuota = ({ handleSubmit }) => {
 
                 </div>
                 <Button variant="primary" type="submit"> Create! </Button>
-
             </Form >
         </div >
-
     )
 }
 

@@ -12,7 +12,7 @@ const UpdateUser = () => {
     const handleUpdate = async (user) => {
 
         try {
-
+            setError(null)
             const response = await axios({
                 method: 'put',
                 url: "http://localhost:5000/api/usuarios/",

@@ -7,18 +7,23 @@
   font-family: 'Gluten', cursive;
 }
 
+#root{
+  background-color: rgba(236, 245, 244, 0.068);
+}
+html{
+  background-color: rgba(236, 245, 244, 0.068);
+}
 
+.container{
+  margin-bottom: 2px;
+}
 .containerPpal{
-  background-color: #fdfbfb;
   width: 95%;
-  height: 92vh;
   margin:auto;
 }
 
 .containerPpal.myUser, .containerPpal.myGym{
-  background-color: #fdfbfb;
   padding-top: 15px;
-
 }
 
 img.fotoAvatar{
@@ -30,7 +35,6 @@ img.fotoAvatar{
 .presentacionCentro{
   width: 80%;
   margin: auto;
-
 }
 
 .homePpal .figure-caption{
@@ -38,7 +42,7 @@ img.fotoAvatar{
   color:black;
 }
 
-.homePpal .btn-primary {
+.btn-primary {
   background-color: #0d83fde3;
 }
 
@@ -49,4 +53,33 @@ a.nav-link{
 a:link, a:visited, a:active, a:hover {
   text-decoration:none;
   color: rgb(5, 5, 5);
+}
+
+.card-img-top{
+  width: 100%;
+  height: 50%;
+}
+
+.mostrarTodosGym .card{
+  --bs-gutter-x: 0rem;
+  margin-right: 0;
+}
+
+.mostrarTodosGym .row{
+  --bs-gutter-x: 0rem;
+  align-items: stretch;
+}
+
+.mostrarCuotas{
+  width: 80%;
+  margin:auto;
+}
+
+.figure-caption p{
+  text-align: left;
+  margin:auto;
+}
+
+p{
+  color:rgb(5, 5, 5)
 }

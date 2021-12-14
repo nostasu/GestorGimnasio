@@ -11,7 +11,7 @@ const CardClasses = (props) => {
     const d = new Date(props.clase.fechaHora);
     let mes = month[d.getMonth()];
     let day = d.getDate();
-    let minutes = (d.getMinutes() === 0 ? '00' : '')
+    let minutes = (d.getMinutes() < 10 ? `0${d.getMinutes()}` : '')
     let hour = `${d.getHours() - 1}:${minutes}`;
 
     const pintaBorrar = () => {
@@ -44,13 +44,12 @@ const CardClasses = (props) => {
             <Card.Body className="fechaHora">
                 {day} <br />
                 {mes} <br />
-
                 {hour}
             </Card.Body >
             <Card.Body className="tipoClase">
                 <Card.Title>{props.clase.tipoClase}</Card.Title>
             </Card.Body>
-            <div className="borraEdita me-1">
+            <div className="borraEdita me-2">
                 {pintaBorrar()}
                 {pintaEditar()}
             </div>

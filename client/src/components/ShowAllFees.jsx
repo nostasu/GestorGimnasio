@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Form, Col } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 
 const ShowAllFees = (props) => {
     const [fees, setFees] = useState([]);
@@ -9,7 +9,6 @@ const ShowAllFees = (props) => {
         const getData = async () => {
             try {
                 const response = await axios("http://localhost:5000/api/cuotas");
-                console.log(response.data);
                 setFees(response.data.fees);
 
             } catch (err) {
@@ -18,7 +17,6 @@ const ShowAllFees = (props) => {
         };
         getData();
     }, []);
-
 
     const [gym, setGym] = useState(null);
 
@@ -31,7 +29,6 @@ const ShowAllFees = (props) => {
                         Authorization: localStorage.getItem("jwt_token")
                     }
                 });
-                console.log(response.data);
                 setGym(response.data.gym);
             } catch (err) {
                 console.log(err.response);
@@ -44,10 +41,8 @@ const ShowAllFees = (props) => {
 
         let arrayFiltrado = fees.filter(cuota => gym.cuotas.includes(cuota._id));
 
-
-        console.log(arrayFiltrado);
         return (
-            <Form.Group as={Col} controlId="formGridState">
+            <Form.Group controlId="formGridState" className="col-md-3">
                 <Form.Label className="mb-0 mt-3">Cuotas</Form.Label>
                 <Form.Select onChange={(e) => handleChange(e)}>
                     <option>Escoge una Cuota!</option>
@@ -60,20 +55,17 @@ const ShowAllFees = (props) => {
                 </Form.Select>
             </Form.Group>
         )
-
-
     }
+
     const handleChange = (e) => {
         //e tiene la informacion del input que desencadena el change
         props.setFee(e.target.value);
-        console.log(props.fee);
     }
 
     return (
-        <div>
-
+        <>
             {gym && cuotasDelGym()}
-        </div>
+        </>
     )
 }
 

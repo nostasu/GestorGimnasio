@@ -19,7 +19,6 @@ const FormUser = (props) => {
     })
     const [fee, setFee] = useState();
     const [gym, setGym] = useState();
-    // const [error, setError] = useState();
 
     const _handleSubmit = (e) => {
         e.preventDefault();
@@ -30,7 +29,6 @@ const FormUser = (props) => {
             props.handleUpdate({ ...user, cuota: fee, gimnasio: gym })
         }
     }
-
 
     const handleChange = (e) => {
         setUser({
@@ -70,7 +68,7 @@ const FormUser = (props) => {
                     </Form.Group>
                 </div>
 
-                <div className="row">
+                <div className="row align-items-baseline justify-content-between">
                     <ShowGyms comesFrom={"showGym"} gym={gym} setGym={setGym} onChange={handleChange} />
 
                     {gym && <ShowAllFess comesFrom={"users"} fee={fee} setFee={setFee} gym={gym} onChange={handleChange} />}
@@ -81,12 +79,10 @@ const FormUser = (props) => {
                     </Form.Group>
                 </div>
                 <Button variant="primary" className="mb-2" type="submit"> Create! </Button>
-            </Form>
+            </Form >
 
             {props.error && <Error error={props.error} />}
-        </div>
-
-
+        </div >
     )
 }
 

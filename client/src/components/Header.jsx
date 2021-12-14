@@ -5,8 +5,6 @@ import Navbar from 'react-bootstrap/Navbar'
 import { Container, Nav } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
-
-
 const Header = () => {
     const [expanded, setExpanded] = useState(false);
     return (
@@ -22,13 +20,10 @@ const Header = () => {
                     >
                         <Link to="/" onClick={() => setExpanded(false)} className="nav-link">Home</Link>
                         <Link to="/NuestrosCentros" onClick={() => setExpanded(false)} className="nav-link"> Nuestros Centros</Link>
-
                     </Nav>
                 </Navbar.Collapse>
             </Container>
         </Navbar>
-
-
     )
 }
 

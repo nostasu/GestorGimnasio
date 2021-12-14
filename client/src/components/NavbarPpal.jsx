@@ -1,11 +1,8 @@
 import React from 'react';
-import "./stylesComponents/navbarPpal.css"
 import Navbar from "react-bootstrap/Navbar"
 import { Link } from 'react-router-dom';
 
-
 const NavbarPpal = (props) => {
-
     const gymOrUser = () => {
         if (props.gym) {
             return (
@@ -17,7 +14,7 @@ const NavbarPpal = (props) => {
     }
 
     return (
-        <Navbar className='fixed-bottom justify-content-around mb-1'>
+        <Navbar className='fixed-bottom justify-content-around mb-1 navBarPpal'>
             {gymOrUser()}
             <Link to="/" className="d-flex flex-column"><i className="bi bi-house-door-fill"></i> Pagina Inicio</Link>
         </Navbar >

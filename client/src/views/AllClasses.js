@@ -7,13 +7,10 @@ import { useParams } from 'react-router';
 import { useLocation } from 'react-router-dom'
 import { Alert } from 'react-bootstrap';
 
-
 const AllClasses = () => {
 
     const [clases, setClases] = useState([]);
-
     let { id } = useParams();
-
     const location = useLocation()
     const { from } = location.state;
 

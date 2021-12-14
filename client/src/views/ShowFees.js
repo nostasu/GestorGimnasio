@@ -43,7 +43,7 @@ const ShowFees = () => {
             }
         }
         getData()
-    }, [fees])
+    }, [])
 
     const cuotasDelGym = () => {
         //Tendre dos arrays, el de las cuotas, y el del gym
@@ -52,28 +52,27 @@ const ShowFees = () => {
         if (arrayFiltrado.length === 0) {
             return (
                 <Alert variant="danger" className="mt-3">
-                    Todavia no existen clases!</Alert>
+                    Todavia no existen cuotas!</Alert>
             )
         }
         return (
-            arrayFiltrado.map((cuota, i) => {
-                return (
-                    < CardFees key={i} cuota={cuota} />
-                );
-            })
+            <div className="row align-items-center justify-content-center mostrarCuotas">
+                {arrayFiltrado.map((cuota, i) => {
+                    return (
+                        < CardFees key={i} cuota={cuota} />
+                    );
+                })
+                }
+            </div >
         )
     }
 
-
-
-    //Aqui tengo el array de cuotas, y tengo el gym por params
     return (
         <div>
             {error && <Error error={error} />}
-            {gym && cuotasDelGym()}
+            {(fees && gym) && cuotasDelGym()}
         </div>
     )
-
 }
 
 export default ShowFees

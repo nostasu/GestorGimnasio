@@ -3,7 +3,7 @@ import axios from "axios";
 import { useEffect } from "react";
 import { useParams } from 'react-router-dom';
 
-const Mostrar1Gym = () => {
+const Show1Gym = () => {
 
     let { GymId } = useParams();
 
@@ -21,11 +21,20 @@ const Mostrar1Gym = () => {
         }
         getData()
     }, [GymId])
+
+    const mostrarCentros = () => {
+        return (
+            <div className="containerPpal mt-3">
+                Página en proceso de creación, mostrará el mapa, entrenadores, y cuotas del gym
+                <h1 className="mt-3"> {gym.nombreCentro}</h1>
+            </div>
+        )
+    }
     return (
         <div>
-            {gym ? gym.nombreCentro : "loading.."}
+            {gym ? mostrarCentros() : "loading.."}
         </div >
     )
 }
 
-export default Mostrar1Gym
+export default Show1Gym

@@ -63,15 +63,13 @@ const FormClass = ({ handleSubmit }) => {
                         />
                     </Form.Group>
 
-                    <Form.Group className="mb-3 col-md-4" value={clase.maxAlumnos} onChange={(e) => handleChange(e)}>
+                    <Form.Group className="mb-3 " value={clase.maxAlumnos} onChange={(e) => handleChange(e)}>
                         <Form.Label className="mb-0"> Maximo Numero Alumnos </Form.Label>
                         <Form.Control type="number" name="maxAlumnos" placeholder="Numero alumnos" />
                     </Form.Group>
                 </div>
                 <Button variant="primary" type="submit"> Create! </Button>
-
             </Form>
-
         </div >
 
     )

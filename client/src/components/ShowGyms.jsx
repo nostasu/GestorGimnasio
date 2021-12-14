@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Cards from "./Cards"
-import { Form, Col } from "react-bootstrap";
-
+import { Form } from "react-bootstrap";
+import "../components/stylesComponents/cards.css"
 
 const ShowGyms = (props) => {
     const [gyms, setGyms] = useState([]);
-
 
     useEffect(() => {
         const getData = async () => {
@@ -21,32 +20,31 @@ const ShowGyms = (props) => {
         getData();
     }, []);
 
-    //Pruebas para renderizado condicional, si el prop viene de signupuser, mostrar solo los nombres
-
-
+    //Para la pagina de nuestros centros, nos muestra cards con los gyms
     const showCards = () => {
         return (
-            <>
-                {gyms.map((gimnasio, i) => {
-                    return (
-                        < Cards key={i} gimnasio={gimnasio} />
-                    );
-                })}
-            </>
+            <div className="mostrarTodosGym d-flex flex-column justify-content-center mb-2" >
+                <div className="row justify-content-center mt-3">
+                    {gyms.map((gimnasio, i) => {
+                        return (
+                            < Cards key={i} gimnasio={gimnasio} />
+                        );
+                    })
+                    }
+                </div>
+            </div >
         )
     }
 
     const handleChange = (e) => {
-        //e tiene la informacion del input que desencadena el change
-        console.log(e);
         props.setGym(e.target.value);
-        console.log(props.gym);
     }
 
+    //Para mostrar en el signin de usuario
     const showNameGyms = () => {
         return (
-            <Form.Group as={Col} controlId="formGridState">
-                <Form.Label className="mb-0">Gimnasio</Form.Label>
+            <Form.Group controlId="formGridState" className="col-md-3">
+                <Form.Label className="mb-0"> Gimnasio</Form.Label >
                 <Form.Select onChange={(e) => handleChange(e)}>
                     <option>Escoge gimnasio!</option>
 
@@ -56,14 +54,14 @@ const ShowGyms = (props) => {
                         );
                     })}
                 </Form.Select>
-            </Form.Group>
+            </Form.Group >
         )
     }
 
     return (
-        <div>
+        <>
             {props.comesFrom ? showNameGyms() : showCards()}
-        </div>
+        </>
     )
 }
 

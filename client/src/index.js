@@ -9,7 +9,7 @@ import SignUpUser from "./views/SignupUser";
 import LoginUser from "./components/LoginUser";
 import SignUpGym from "./views/SignupGym";
 import LoginGym from "./components/LoginGym";
-import Mostrar1Gym from './components/Mostrar1Gym';
+import Show1Gym from './components/Show1Gym';
 import ShowFees from './views/ShowFees';
 import MyUser from './views/MyUser';
 import MyGym from './views/MyGym';
@@ -34,7 +34,7 @@ ReactDOM.render(
       <Route path="/" element={<App />} >
         <Route index element={<HomePpal />} />
         <Route exact path="/NuestrosCentros" element={<NuestrosCentros />} />
-        <Route path="/NuestrosCentros/:GymId" element={<Mostrar1Gym />} />
+        <Route path="/NuestrosCentros/:GymId" element={<Show1Gym />} />
         <Route path="/SignUpUser" element={<SignUpUser />} />
         <Route path="/LoginUser" element={<LoginUser />} />
         <Route path="/SignUpGym" element={<SignUpGym />} />
@@ -54,10 +54,9 @@ ReactDOM.render(
           <Route path="/BorrarClase/:claseId" element={<DeleteTraining />} />
           <Route path="/ActualizarGimnasio" element={<UpdateGym />} />
           <Route path="/ActualizarUsuario" element={<UpdateUser />} />
-
+          <Route exact path="/TodasClases/:id/:idUser" element={<AllClasses />} />
+          <Route path="/BorrarClaseGym/:claseId" element={<DeleteGymClass />} />
         </Route>
-        <Route exact path="/TodasClases/:id/:idUser" element={<AllClasses />} />
-        <Route path="/BorrarClaseGym/:claseId" element={<DeleteGymClass />} />
       </Route>
     </Routes>
 

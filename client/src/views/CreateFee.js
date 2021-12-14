@@ -1,12 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react'
 import axios from 'axios';
 import FormCuota from '../components/FormCuota'
 import { useNavigate } from 'react-router-dom';
-
+import Error from '../components/Error';
 
 const CreateFee = () => {
     let navigate = useNavigate();
 
+    const [error, setError] = useState(null);
     const handleSubmit = async (fee) => {
         try {
 
@@ -29,6 +30,7 @@ const CreateFee = () => {
 
         } catch (err) {
             console.log(err.response);
+            setError(err.response.data);
         };
 
     }
@@ -36,6 +38,7 @@ const CreateFee = () => {
     return (
         <div>
             <FormCuota handleSubmit={handleSubmit} />
+            {error && <Error error={error} />}
         </div>
     )
 }

@@ -3,7 +3,6 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import CardClasses from './CardClasses';
 
-
 const Show1Training = ({ reservaId }) => {
 
     const [reserva, setReserva] = useState(null);
@@ -24,20 +23,17 @@ const Show1Training = ({ reservaId }) => {
         getData()
     }, [reservaId])
 
-
     const loading = () => {
         return ("Loading..");
     }
 
     const pintarPantalla = () => {
-
         return (
             <>
                 <CardClasses clase={reserva} />
             </>
         )
     }
-
 
     return (
         <>
