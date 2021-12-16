@@ -10,7 +10,7 @@ const SignUpUser = () => {
         try {
             const response = await axios({
                 method: 'post',
-                url: "http://localhost:5000/api/authUser/signup",
+                url: "/authUser/signup",
                 data: user
             })
 

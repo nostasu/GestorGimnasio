@@ -29,7 +29,7 @@ const LoginGym = () => {
   const submit = async () => {
 
     try {
-      const response = await axios.post("http://localhost:5000/api/authGym/login", gym);
+      const response = await axios.post("/authGym/login", gym);
       console.log(response.data);
       localStorage.setItem("jwt_token", response.data.token);
       navigate('/MyGym');

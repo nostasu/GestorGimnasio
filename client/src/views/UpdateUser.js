@@ -15,7 +15,7 @@ const UpdateUser = () => {
             setError(null)
             const response = await axios({
                 method: 'put',
-                url: "http://localhost:5000/api/usuarios/",
+                url: "/usuarios/",
                 headers: {
                     Authorization: localStorage.getItem("jwt_token")
                 },
@@ -32,7 +32,7 @@ const UpdateUser = () => {
     }
     return (
         <div>
-            <FormUser handleUpdate={handleUpdate} error={error} />
+            <FormUser handleSubmit={handleUpdate} error={error} />
             {exito &&
                 <div><Alert> User Updated! </Alert>< Link to={"/MyUser"}><Button variant="primary"> Go Home!</Button></Link> </div>
             }

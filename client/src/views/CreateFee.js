@@ -18,7 +18,7 @@ const CreateFee = () => {
 
             const response = await axios({
                 method: 'post',
-                url: "http://localhost:5000/api/cuotas",
+                url: "/cuotas",
                 headers: {
                     Authorization: localStorage.getItem("jwt_token"),
                     'Content-Type': 'application/x-www-form-urlencoded',

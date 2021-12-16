@@ -23,7 +23,7 @@ const SignUpGym = () => {
 
             const response = await axios({
                 method: 'post',
-                url: "http://localhost:5000/api/authGym/signup",
+                url: "/authGym/signup",
                 headers: { "Content-Type": "multipart/form-data" },
                 data: formData
             })

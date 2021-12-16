@@ -22,12 +22,8 @@ const FormUser = (props) => {
 
     const _handleSubmit = (e) => {
         e.preventDefault();
-        if (props.handleSubmit) {
-            props.handleSubmit({ ...user, cuota: fee, gimnasio: gym })
-        }
-        if (props.handleUpdate) {
-            props.handleUpdate({ ...user, cuota: fee, gimnasio: gym })
-        }
+        props.handleSubmit({ ...user, cuota: fee, gimnasio: gym })
+
     }
 
     const handleChange = (e) => {

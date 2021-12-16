@@ -13,7 +13,7 @@ const BorrarGym = () => {
             try {
                 const response = await axios({
                     method: 'delete',
-                    url: "http://localhost:5000/api/gimnasios/",
+                    url: "/gimnasios/",
                     headers: {
                         Authorization: localStorage.getItem("jwt_token"),
                     },

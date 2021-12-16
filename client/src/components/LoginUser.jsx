@@ -28,7 +28,7 @@ const LoginUser = () => {
 
     const submit = async () => {
         try {
-            const response = await axios.post("http://localhost:5000/api/authUser/login", user);
+            const response = await axios.post("/authUser/login", user);
             console.log(response.data);
             localStorage.setItem("jwt_token", response.data.token);
             navigate('/MyUser');

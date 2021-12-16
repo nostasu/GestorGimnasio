@@ -33,7 +33,7 @@ const CardClasses = (props) => {
             }
             return (
                 <>
-                    <Card.Body><Link to={`/ApuntarseClase/${props.clase._id}`}><i className="bi bi-pen-fill"></i></Link></Card.Body>
+                    <Card.Body><Link to={`/ApuntarseClase/${props.clase._id}`}><i class="bi bi-check2-square"></i></Link></Card.Body>
                 </>
             )
         }

@@ -12,7 +12,7 @@ const Show1Gym = () => {
     useEffect(() => {
         const getData = async () => {
             try {
-                let response = await axios(`http://localhost:5000/api/gimnasios/find/${GymId}`);
+                let response = await axios(`/gimnasios/find/${GymId}`);
                 console.log(response.data);
                 setGym(response.data.gym);
             } catch (err) {

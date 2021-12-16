@@ -12,7 +12,7 @@ const MyGym = () => {
         const getData = async () => {
             try {
                 let response = await axios({
-                    url: `http://localhost:5000/api/gimnasios/myGym`,
+                    url: `/gimnasios/myGym`,
                     headers: {
                         Authorization: localStorage.getItem("jwt_token")
                     }

@@ -13,7 +13,7 @@ const BorrarUsuario = () => {
             try {
                 const response = await axios({
                     method: 'delete',
-                    url: "http://localhost:5000/api/usuarios/",
+                    url: "/usuarios/",
                     headers: {
                         Authorization: localStorage.getItem("jwt_token"),
                     },

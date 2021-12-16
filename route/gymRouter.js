@@ -159,7 +159,7 @@ gymRouter
 
             return res.status(201).json({
                 sucess: true,
-                message: `Gym deleted: ${id} successfully`
+                message: `Gym deleted: ${gymBorrado.nombreCentro} successfully`
             });
 
         } catch (err) {
@@ -230,28 +230,28 @@ gymRouter.get("/listarCuotas/:id", checkToken, async (req, res, next) => {
                 sucess: false,
                 message: `There isn't any gym with the id: ${id}`
             })
-        } else {
+        }
 
-            const usuariosCuota = await Users.find().select("nombre apellidos cuota");
+        const usuariosCuota = await Users.find().select("nombre apellidos cuota");
 
-            const usFiltrados = usuariosCuota.filter(user => {
-                if (user.cuota.equals(cuotas)) {
-                    return user
-                }
-            });
-
-            if (usFiltrados.length == 0) {
-                return next({
-                    sucess: false,
-                    message: `There isn't any user with the fee id: ${cuotas}`
-                })
+        const usFiltrados = usuariosCuota.filter(user => {
+            if (user.cuota.equals(cuotas)) {
+                return user
             }
+        });
 
-            return res.status(201).json({
-                success: true,
-                usFiltrados
+        if (usFiltrados.length == 0) {
+            return next({
+                sucess: false,
+                message: `There isn't any user with the fee id: ${cuotas}`
             })
         }
+
+        return res.status(201).json({
+            success: true,
+            usFiltrados
+        })
+
 
     } catch (err) {
         return next({

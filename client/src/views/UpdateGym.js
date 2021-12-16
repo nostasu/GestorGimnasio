@@ -35,7 +35,7 @@ const UpdateGym = () => {
 
             const response = await axios({
                 method: 'put',
-                url: "http://localhost:5000/api/gimnasios",
+                url: "/gimnasios",
 
                 headers: {
                     Authorization: localStorage.getItem("jwt_token"),

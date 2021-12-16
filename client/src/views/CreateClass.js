@@ -13,7 +13,7 @@ const CreateClass = () => {
         try {
             const response = await axios({
                 method: 'post',
-                url: "http://localhost:5000/api/clases",
+                url: "/clases",
                 headers: {
                     Authorization: localStorage.getItem("jwt_token"),
                 },

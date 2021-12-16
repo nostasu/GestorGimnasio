@@ -237,7 +237,7 @@ classRouter.delete("/delete/:id", checkToken, async (req, res, next) => {
 
         return res.status(200).json({
             success: true,
-            message: `The class with id: ${id} is deleted`
+            message: `The class ${claseABorrar.tipoClase} is deleted`
         });
 
     } catch (err) {

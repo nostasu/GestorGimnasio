@@ -11,7 +11,7 @@ const Show1Training = ({ reservaId }) => {
         const getData = async () => {
             try {
                 let response = await axios({
-                    url: `http://localhost:5000/api/clases/find/${reservaId}`,
+                    url: `/clases/find/${reservaId}`,
                 });
                 console.log(response.data);
                 setReserva(response.data.clase);

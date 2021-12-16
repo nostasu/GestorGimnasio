@@ -8,7 +8,7 @@ const ShowAllFees = (props) => {
     useEffect(() => {
         const getData = async () => {
             try {
-                const response = await axios("http://localhost:5000/api/cuotas");
+                const response = await axios("/cuotas");
                 setFees(response.data.fees);
 
             } catch (err) {
