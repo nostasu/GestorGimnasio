@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 
 require('cloudinary').config();
 const CLOUDINARY_URL = process.env.CLOUDINARY_URL;
