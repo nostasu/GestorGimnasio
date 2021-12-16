@@ -18,12 +18,12 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(cors());
 
-app.use("/api/authGym", require("./route/AuthRouterGyms.js"));
-app.use("/api/authUser", require("./route/AuthRouterUsers"));
-app.use("/api/usuarios", checkToken, require("./route/userRouter"));
-app.use("/api/gimnasios", require("./route/gymRouter"));
-app.use("/api/clases", require("./route/classRouter"));
-app.use("/api/cuotas", require("./route/feesRouter"));
+app.use("/api/authGym", require("./routes/AuthRouterGyms.js"));
+app.use("/api/authUser", require("./routes/AuthRouterUsers"));
+app.use("/api/usuarios", checkToken, require("./routes/userRouter"));
+app.use("/api/gimnasios", require("./routes/gymRouter"));
+app.use("/api/clases", require("./routes/classRouter"));
+app.use("/api/cuotas", require("./routes/feesRouter"));
 
 app.use(errorHandler);
 
