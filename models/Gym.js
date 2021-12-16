@@ -12,13 +12,21 @@ const gymSchema = new Schema({
         required: true,
     },
     direccion: String,
-    //logo: img,
+    logo: {
+        type: String
+    },
+    cloudinary_id: {
+        type: String
+    },
     entrenadores: [{
         nombreApellidos: {
             type: String,
             required: true
         },
-        edad: Number
+        edad: {
+            type: Number,
+            required: true
+        }
     }],
     cuotas: [{
         type: mongoose.Types.ObjectId,

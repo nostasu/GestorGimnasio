@@ -198,7 +198,7 @@ classRouter.put("/update/:id", checkToken, async (req, res, next) => {
 //Delete a class and all dependencies
 classRouter.delete("/delete/:id", checkToken, async (req, res, next) => {
     try {
-
+        console.log("entra!");
         const idGym = req.user.id;
         const { id } = req.params;
 
@@ -222,7 +222,7 @@ classRouter.delete("/delete/:id", checkToken, async (req, res, next) => {
 
         if (claseABorrar.alumnosInscritos.length != 0) {
             //hay alumnos inscritos en esa clase, borrar de su array de reservas la clase
-            claseABorrar.alumnosInscritos.forEach(alumno => {
+            claseABorrar.alumnosInscritos.forEach(async alumno => {
                 const usuario = await User.findById(alumno);
                 let indice = usuario.reservas.findIndex(reserva => {
                     return reserva.clase.equals(claseABorrar) &&
@@ -237,7 +237,7 @@ classRouter.delete("/delete/:id", checkToken, async (req, res, next) => {
 
         return res.status(200).json({
             success: true,
-            message: `The class with id: ${id} is deleted`
+            message: `The class ${claseABorrar.tipoClase} is deleted`
         });
 
     } catch (err) {
@@ -292,4 +292,6 @@ classRouter.get("/find/:id", async (req, res, next) => {
         });
     }
 })
+
+
 module.exports = classRouter;

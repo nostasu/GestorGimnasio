@@ -1,38 +1,85 @@
-.App {
-  text-align: center;
-}
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+* {
+  margin: 0px;
+  padding: 0px;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  text-align: center;
+  font-family: 'Gluten', cursive;
 }
 
-.App-link {
-  color: #61dafb;
+#root{
+  background-color: rgba(236, 245, 244, 0.068);
+}
+html{
+  background-color: rgba(236, 245, 244, 0.068);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.container{
+  margin-bottom: 2px;
+}
+.containerPpal{
+  width: 95%;
+  margin:auto;
+}
+
+.containerPpal.myUser, .containerPpal.myGym{
+  padding-top: 15px;
+}
+
+img.fotoAvatar{
+  width: 40%;
+  max-width: 300px;
+  height: auto;
+}
+
+.presentacionCentro{
+  width: 80%;
+  margin: auto;
+}
+
+.homePpal .figure-caption{
+  font-size: 1em;
+  color:black;
+}
+
+.btn-primary {
+  background-color: #0d83fde3;
+}
+
+a.nav-link{
+  font-size: 1.25em;
+}
+
+a:link, a:visited, a:active, a:hover {
+  text-decoration:none;
+  color: rgb(5, 5, 5);
+}
+
+.card-img-top{
+  width: 100%;
+  height: 50%;
+}
+
+.mostrarTodosGym .card{
+  --bs-gutter-x: 0rem;
+  margin-right: 0;
+}
+
+.mostrarTodosGym .row{
+  --bs-gutter-x: 0rem;
+  align-items: stretch;
+}
+
+.mostrarCuotas{
+  width: 80%;
+  margin:auto;
+}
+
+.figure-caption p{
+  text-align: left;
+  margin:auto;
+}
+
+p{
+  color:rgb(5, 5, 5)
 }

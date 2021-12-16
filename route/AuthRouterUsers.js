@@ -40,7 +40,7 @@ AuthRouter.post("/signup", async (req, res, next) => {
         if (cuota) {
             let existeCuota = gymExiste.cuotas.find(cuotaGym => cuotaGym.equals(cuota));
             if (!existeCuota) {
-                return res.status(403).json({
+                return next({
                     success: false,
                     message: `Hey! There isn't any fee in the gym ${gymExiste.nombreCentro} with with this id: ${gimnasio}!`
                 });
@@ -75,12 +75,13 @@ AuthRouter.post("/signup", async (req, res, next) => {
         return res.status(201).json({
             success: true,
             user: newUser,
+            message: "User created succesfully"
         })
 
     } catch (err) {
         return next({
             status: 403,
-            message: err
+            message: err.message
         });
     }
 })
@@ -118,7 +119,7 @@ AuthRouter.post("/login", async (req, res, next) => {
     } catch (err) {
         return next({
             status: 403,
-            message: err
+            message: err.message
         });
     }
 })

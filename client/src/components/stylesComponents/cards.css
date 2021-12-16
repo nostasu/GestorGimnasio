@@ -1,0 +1,20 @@
+.cardClasses{
+    background-color: #E1F0FF;
+    flex-direction: row;
+    width: 22rem;
+    height: 5rem;
+}
+
+.fechaHora.card-body{
+    max-width:8rem;
+    align-items:flex-start;
+}
+
+.tipoClase{
+    width: 11rem;
+}
+
+.cuotasGym {
+    width: 80%;
+    margin: auto;
+}

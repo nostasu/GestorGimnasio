@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const clasesSchema = new Schema({
     tipoClase: {
         type: String,
-        enum: ["Tacfit", "Clase", "Entrenamiento Personal"],
+        enum: ["Tacfit", "Clase en Grupo", "Entrenamiento Personal"],
         required: true
     },
     fechaHora: {

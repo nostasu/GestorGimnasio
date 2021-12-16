@@ -3,6 +3,9 @@ const Gym = require("../models/Gym"); //requerimos el export
 const Users = require("../models/User");
 const Class = require("../models/Class");
 const { checkToken } = require("../middleware");
+const bcrypt = require("bcrypt");
+const cloudinary = require('../cloudinary/cloudinary');
+const upload = require('../cloudinary/multer');
 const gymRouter = express.Router();
 
 gymRouter
@@ -48,18 +51,53 @@ gymRouter
         }
     })
     //Updating the gym
-    .put(checkToken, async (req, res, next) => {
+    .put(upload.single("logo"), checkToken, async (req, res, next) => {
+
         try {
             const { id } = req.user  //La id del gimnasio
 
-            const { direccion, entrenadores } = req.body;
+            const { nombreCentro, password, direccion, logo, cloudinary_id, entrenadores, cuotas, clases } = req.body;
+
 
             let gym = await Gym.findById(id);
+
             if (!gym) {
                 return next({
                     sucess: false,
                     message: "There isn't any gym with this id"
                 })
+            }
+
+            if (nombreCentro) {
+                const foundGymName = await Gym.findOne({ nombreCentro });
+                if (foundGymName && (foundGymName.nombreCentro != nombreCentro)) {
+                    return next({
+                        sucess: false,
+                        message: "Already exists a gym with this name!"
+                    })
+                }
+
+                gym.nombreCentro = nombreCentro;
+            }
+
+            if (password) {
+                if (!password.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{6,1024}$/)) { //special/number/capital/6 characters))
+                    return next({
+                        sucess: false,
+                        message: 'The password must contain 6 dígits, uppercase, lowercase and special characters'
+                    })
+                }
+
+                const hash = await bcrypt.hash(password, 10);
+
+                gym.password = hash;
+            }
+
+            if (req.file) {
+                const result = await cloudinary.uploader.upload(req.file.path);
+                await cloudinary.uploader.destroy(gym.cloudinary_id);
+                gym.logo = result.secure_url;
+                gym.cloudinary_id = result.public_id;
             }
 
             if (direccion) {
@@ -70,19 +108,21 @@ gymRouter
             }
 
             const gymUpdate = await gym.save();
+
             return res.status(201).json({
                 sucess: true,
+                message: "Gym updated succesfully",
                 gymUpdate
             })
 
         } catch (err) {
             return next({
                 status: 403,
-                message: err
+                message: err.message
             });
         }
     })
-
+    //delete gym
     .delete(checkToken, async (req, res, next) => {
         try {
             const { id } = req.user;
@@ -94,6 +134,7 @@ gymRouter
                     message: "There isn't any gym with this id"
                 })
             }
+            await cloudinary.uploader.destroy(gymBorrado.cloudinary_id);
 
             //Delete all the classes of the model Classes that are created by the gym
             gymBorrado.clases.forEach(async claseBorrar => {
@@ -118,13 +159,13 @@ gymRouter
 
             return res.status(201).json({
                 sucess: true,
-                message: `Gym deleted: ${id} successfully`
+                message: `Gym deleted: ${gymBorrado.nombreCentro} successfully`
             });
 
         } catch (err) {
             return next({
                 status: 403,
-                message: err
+                message: err.message
             });
         }
     });
@@ -148,7 +189,7 @@ gymRouter.get("/find/:id", async (req, res, next) => {
     } catch (err) {
         return next({
             status: 403,
-            message: err
+            message: err.message
         });
     }
 })
@@ -189,28 +230,28 @@ gymRouter.get("/listarCuotas/:id", checkToken, async (req, res, next) => {
                 sucess: false,
                 message: `There isn't any gym with the id: ${id}`
             })
-        } else {
+        }
 
-            const usuariosCuota = await Users.find().select("nombre apellidos cuota");
+        const usuariosCuota = await Users.find().select("nombre apellidos cuota");
 
-            const usFiltrados = usuariosCuota.filter(user => {
-                if (user.cuota.equals(cuotas)) {
-                    return user
-                }
-            });
-
-            if (usFiltrados.length == 0) {
-                return next({
-                    sucess: false,
-                    message: `There isn't any user with the fee id: ${cuotas}`
-                })
+        const usFiltrados = usuariosCuota.filter(user => {
+            if (user.cuota.equals(cuotas)) {
+                return user
             }
+        });
 
-            return res.status(201).json({
-                success: true,
-                usFiltrados
+        if (usFiltrados.length == 0) {
+            return next({
+                sucess: false,
+                message: `There isn't any user with the fee id: ${cuotas}`
             })
         }
+
+        return res.status(201).json({
+            success: true,
+            usFiltrados
+        })
+
 
     } catch (err) {
         return next({
@@ -220,4 +261,53 @@ gymRouter.get("/listarCuotas/:id", checkToken, async (req, res, next) => {
     }
 })
 
+//all the classes of the gym login
+gymRouter.get("/clasesGym", checkToken, async (req, res, next) => {
+    try {
+        const { id } = req.user;
+
+        let gym = await Gym.findById(id).select("clases").populate("clases");
+        if (!gym) {
+            return next({
+                sucess: false,
+                message: `There isn't any gym with the id: ${id}`
+            })
+        }
+
+        return res.status(201).json({
+            success: true,
+            gym
+        })
+
+    } catch (err) {
+        return next({
+            status: 403,
+            message: err
+        });
+    }
+})
+
+
+//find my gym connected
+gymRouter.get("/myGym", checkToken, async (req, res, next) => {
+    try {
+        const { id } = req.user;
+        const gym = await Gym.findById(id);
+        if (!gym) {
+            return next({
+                sucess: false,
+                message: `There isn't any gym with this id: ${id}`
+            })
+        }
+        return res.status(201).json({
+            success: true,
+            gym
+        })
+    } catch (err) {
+        return next({
+            status: 403,
+            message: err
+        });
+    }
+})
 module.exports = gymRouter;

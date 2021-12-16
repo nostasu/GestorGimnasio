@@ -1,5 +1,10 @@
 require("dotenv").config();
 const express = require("express");
+const cors = require("cors");
+
+require('cloudinary').config();
+const CLOUDINARY_URL = process.env.CLOUDINARY_URL;
+
 const connectDB = require("./DB/connection");
 const { checkToken, errorHandler } = require("./middleware");
 
@@ -10,6 +15,8 @@ connectDB();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(cors());
 
 app.use("/api/authGym", require("./route/AuthRouterGyms.js"));
 app.use("/api/authUser", require("./route/AuthRouterUsers"));
