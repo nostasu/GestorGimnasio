@@ -15,7 +15,7 @@ const UpdateUser = () => {
             setError(null)
             const response = await axios({
                 method: 'put',
-                url: "/usuarios/",
+                url: "/api/usuarios/",
                 headers: {
                     Authorization: localStorage.getItem("jwt_token")
                 },

@@ -16,7 +16,7 @@ const JoinClass = () => {
             try {
                 const response = await axios({
                     method: 'put',
-                    url: `/usuarios/inscribirse/${idClase}`,
+                    url: `/api/usuarios/inscribirse/${idClase}`,
                     headers: {
                         Authorization: localStorage.getItem("jwt_token")
                     }

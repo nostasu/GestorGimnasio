@@ -10,7 +10,7 @@ const SignUpUser = () => {
         try {
             const response = await axios({
                 method: 'post',
-                url: "/authUser/signup",
+                url: "/api/authUser/signup",
                 data: user
             })
 

@@ -18,7 +18,7 @@ const AllClasses = () => {
         const getData = async () => {
             try {
                 const response = await axios({
-                    url: "/clases",
+                    url: "/api/clases",
                 });
                 setClases(response.data.classes);
 

@@ -17,7 +17,7 @@ const DeleteTraining = () => {
             try {
                 const response = await axios({
                     method: 'put',
-                    url: `/usuarios/delete/clase/${claseId}`,
+                    url: `/api/usuarios/delete/clase/${claseId}`,
                     headers: {
                         Authorization: localStorage.getItem("jwt_token"),
                     },

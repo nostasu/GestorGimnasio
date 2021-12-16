@@ -13,7 +13,7 @@ const ShowFees = () => {
         const getFees = async () => {
             try {
                 const response = await axios({
-                    url: "/cuotas",
+                    url: "/api/cuotas",
                 });
                 console.log(response.data);
                 setFees(response.data.fees);
@@ -31,7 +31,7 @@ const ShowFees = () => {
         const getData = async () => {
             try {
                 let response = await axios({
-                    url: `http://localhost:5000/api/gimnasios/myGym`,
+                    url: `api/gimnasios/myGym`,
                     headers: {
                         Authorization: localStorage.getItem("jwt_token")
                     }

@@ -8,7 +8,7 @@ const ShowAllFees = (props) => {
     useEffect(() => {
         const getData = async () => {
             try {
-                const response = await axios("/cuotas");
+                const response = await axios("/api/cuotas");
                 setFees(response.data.fees);
 
             } catch (err) {
@@ -24,7 +24,7 @@ const ShowAllFees = (props) => {
         const getData = async () => {
             try {
                 let response = await axios({
-                    url: `http://localhost:5000/api/gimnasios/find/${props.gym}`,
+                    url: `/api/gimnasios/find/${props.gym}`,
                     headers: {
                         Authorization: localStorage.getItem("jwt_token")
                     }

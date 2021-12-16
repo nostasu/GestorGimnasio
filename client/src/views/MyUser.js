@@ -15,7 +15,7 @@ const MyUser = () => {
         const getData = async () => {
             try {
                 let response = await axios({
-                    url: `/usuarios/myUser`,
+                    url: `/api/usuarios/myUser`,
                     headers: {
                         Authorization: localStorage.getItem("jwt_token")
                     }
