@@ -14,10 +14,10 @@ AuthRouterGym.post("/signup", upload.single("logo"), async (req, res, next) => {
 
         const result = await cloudinary.uploader.upload(req.file.path);
         const { nombreCentro, password, direccion, logo, cloudinary_id, entrenadores, cuotas, clases } = req.body;
-        if (!nombreCentro || !password) {
+        if (!nombreCentro || !password || !entrenadores) {
             return next({
                 sucess: false,
-                message: "Required fields: nombreCentro, password!"
+                message: "Required fields: nombreCentro, password, entrenadores!"
             })
         }
 
