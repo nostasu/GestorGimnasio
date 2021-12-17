@@ -2,7 +2,11 @@
 # Introducción a la página web
 
 https://gestor-reservas-app.herokuapp.com/
+
+Página Web en desarrollo, faltan por optimizar un par de cosas al modificar usuarios y gimnasios, y falta el calendario personalizado del usuario, ademas de modificar algo el CSS.
+
 ## Descripcion del proyecto.
+
 La web consiste en un gestor de reservas de clases, la funcionalidad principal es que los usuarios, previa identificación del gimnasio en el que están inscritos, puedan reservar sus clases para entrenar, teniendo en cuenta su cuota (cuantas clases mensuales pagan). 
 El usuario tendrá sus datos identificativos: id, nombre, apellidos, tlfn, email, contraseña y cuota.
 Las clases tendrán aforo máximo y únicamente el usuario no podrá efectuar la reserva si las clases están completas. 
@@ -96,4 +100,5 @@ Para la version 3.1:
 
 Para futuras implementaciones:
     1. React Native. 
+    2. Calendario de mis reservas en usuario.
     
