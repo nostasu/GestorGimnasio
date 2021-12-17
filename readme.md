@@ -1,5 +1,7 @@
 
 # Introducción a la página web
+
+https://gestor-reservas-app.herokuapp.com/
 ## Descripcion del proyecto.
 La web consiste en un gestor de reservas de clases, la funcionalidad principal es que los usuarios, previa identificación del gimnasio en el que están inscritos, puedan reservar sus clases para entrenar, teniendo en cuenta su cuota (cuantas clases mensuales pagan). 
 El usuario tendrá sus datos identificativos: id, nombre, apellidos, tlfn, email, contraseña y cuota.
@@ -11,6 +13,8 @@ Los gimnasios también tendrán acceso a quien ha reservado sus clases, y podrá
 - Postman para hacer de intermediario entre la BBDD y el backend.
 - Visual Estudio Code
 - Node js
+- React
+- JavaScript
 
 ## Instalaciones necesarias para ejecutar el proyecto.
 - Instalar nodeJs y hacer un npm init en el editor de código.
@@ -74,12 +78,22 @@ Los gimnasios también tendrán acceso a quien ha reservado sus clases, y podrá
  
 ## Versiones
 Version 1.0 sin FrontEnd, finalizada el 17/11/2021
+Version 2.0 finalizado FrontEnd a falta de mejoras, entregado día 15/12/2011
+    - Se han mejorado el código del backend, optimizándolo, mejoras en los modelos.
+    - Se han agregado imagenes para los logos del gimnasio.
+    - Las clases ahora son mensualmente, el usuario mantiene las clases pasadas para poder consultarlas.
+
+Version 3.0 en desarrollo.
+
 
 ## To do
-1. Me gustaría pasar toda la aplicación a inglés,
-2. Optimizar las funciones
-3. Imagenes gym para logo
-4. Modificar error de apuntarse a una clase, en lugar de mirarlo semanalmente, tiene que ser mensual y no borrar las clases.
-5. fee indicar un nombre de cuota basica, premium, pro
-6. eliminar las contraseñas de las pruebas que no interesen
-7. gym admin?
+
+Para la version 3.1:
+    1. Hacer un modo oscuro.
+    2. Al modificar el gimnasio, mostrar los entrenadores que tiene el gimnasio actualmente y poder borrarlos y modificarlos. (Implementado con chips)
+
+    3. Al hacer la actualización de usuario, si se modifica el gimnasio o la cuota, comprobar las clases reservadas, si se cambia de gimnasio anular las reservas futuras.
+
+Para futuras implementaciones:
+    1. React Native. 
+    
